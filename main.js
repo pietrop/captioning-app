@@ -24,7 +24,7 @@ function createWindow () {
     slashes: true
   }))
 
-   mainWindow.dataPath = app.getAppPath()+"/tmp";//.getPath("appData");
+   mainWindow.dataPath = app.getPath("desktop");
    mainWindow.app = app;
 
     mainWindow.desktopPath = app.getPath("desktop");

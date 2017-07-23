@@ -12,7 +12,7 @@ const exec = require('child_process').exec;
 const {dialog} = require('electron').remote;
 var currentWindow = electron.remote.getCurrentWindow();
 var electronShell = require("electron").shell;
-var dataPath = currentWindow.dataPath; 
+var dataPath = currentWindow.dataPath.replace(/ /g,"\\ "); 
 var desktopPath = currentWindow.desktopPath;
 console.log("dataPath",dataPath)
 
@@ -79,7 +79,7 @@ alignBtnEl.onclick = function(){
 	//create text file of content of text box. in tmp folder.
 	var textFile = createTextFileFromTextEditor();
 	var fileName = path.basename(sourceVideoPath);
-	var outPutSegmentedFile =  dataPath +"/"+ fileName+"._segmented"+".txt";
+	var outPutSegmentedFile =   dataPath+"/"+fileName+"._segmented"+".txt";
 	console.log('outPutSegmentedFile',outPutSegmentedFile);
 	//should call perl scrip to prep on textfile to prep it for aeneas
 	
@@ -122,7 +122,7 @@ function createTextFileFromTextEditor(){
 	console.log('fileName',fileName);
 
 	//TODO: add path.  use path library
-	var tmpTextFileName = dataPath +"/"+ fileName+".txt";
+	var tmpTextFileName = dataPath+"/"+ fileName+".txt";
 	console.log('tmpTextFileName',tmpTextFileName)
 	fs.writeFileSync(tmpTextFileName, getContentFromTextEditor(),'utf8');
 	return tmpTextFileName; 
@@ -343,7 +343,7 @@ function runAeneasComand(config,cb){
 	var audio_file_tail_length = config.audio_file_tail_length; //16.000
 	// var tmpTextFileName = dataPath +"/"+ fileName;
 	var fileName = path.basename(mediaFile);
-	var outputCaptionFile = path.join(dataPath,fileName+"."+captionFileFormat);
+	var outputCaptionFile = dataPath+"/"+fileName+"."+captionFileFormat;
 	console.log(JSON.stringify(config,null,2));
 
 	var aeneasComandString = `aeneas_execute_task "${mediaFile}" "${textFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`//.srt
@@ -393,7 +393,7 @@ function runAeneasComand(config,cb){
 function segmentTranscript(config,cb){
 	var inputFile 				= config.textFile;
 	var outPutSegmentedFile 	= config.outPutSegmentedFile;
-	var segmentTranscriptComand =`perl sentence-boundary.pl -d HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
+	var segmentTranscriptComand =`perl ./sentence-boundary.pl -d ./HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
 		exec(segmentTranscriptComand, function(error, stdout, stderr) {
 		if(cb){cb(outPutSegmentedFile)}
 	    console.log('stdout: ' + stdout);

@@ -26,6 +26,13 @@ Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](ht
 
 - [ ] add `vtt` track (see if it is possible to update) to preview captions on video element.
 
+##  Screenshots
+
+![caption-maker home screen](docs/img/caption-maker-1.png)
+
+![caption-maker text editing](docs/img/caption-maker-2.png)
+
+![caption-maker srt preview](docs/img/caption-maker-3.png)
 
 
 
