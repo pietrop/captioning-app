@@ -1,6 +1,6 @@
 # Captioning app. 
 
-Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](http://textAV.tech) event.
+Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](http://textAV.tech) event unconference group.
 
 
 ##  Screenshots and usage
