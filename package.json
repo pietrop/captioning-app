@@ -1,5 +1,5 @@
 {
-  "name": "caption-maker",
+  "name": "captions-maker",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
@@ -24,6 +24,7 @@
   },
   "build": {
     "appId": "org.otranscribe.otranscribe-electron",
+    "asar": false,
     "dmg": {
       "contents": [
         {

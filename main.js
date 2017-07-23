@@ -28,6 +28,7 @@ function createWindow () {
    mainWindow.app = app;
 
     mainWindow.desktopPath = app.getPath("desktop");
+    mainWindow.appPath = app.getAppPath();
     // mainWindow.desktopPath = desktopPath;
 
 

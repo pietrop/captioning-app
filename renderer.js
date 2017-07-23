@@ -14,7 +14,10 @@ var currentWindow = electron.remote.getCurrentWindow();
 var electronShell = require("electron").shell;
 var dataPath = currentWindow.dataPath.replace(/ /g,"\\ "); 
 var desktopPath = currentWindow.desktopPath;
-console.log("dataPath",dataPath)
+var appPath = currentWindow.appPath;
+console.log("appPath",appPath);
+
+console.log("dataPath",dataPath);
 
 var alignBtnEl = document.getElementById('alignBtn');
 var exportSrtBtnEl = document.getElementById('exportSrtBtn');
@@ -393,7 +396,7 @@ function runAeneasComand(config,cb){
 function segmentTranscript(config,cb){
 	var inputFile 				= config.textFile;
 	var outPutSegmentedFile 	= config.outPutSegmentedFile;
-	var segmentTranscriptComand =`perl ./sentence-boundary.pl -d ./HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
+	var segmentTranscriptComand =`perl ${appPath}/sentence-boundary.pl -d {appPath}/HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
 		exec(segmentTranscriptComand, function(error, stdout, stderr) {
 		if(cb){cb(outPutSegmentedFile)}
 	    console.log('stdout: ' + stdout);
