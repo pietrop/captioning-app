@@ -55,7 +55,7 @@ selectFileBtnEl.onclick = function(){
 		console.log(file[0]);
 		sourceVideoPath = file[0];
 		loadHtml5Video(sourceVideoPath);
-		loadEditorWithDummyText();
+		// loadEditorWithDummyText();
 
 	});
 };
@@ -99,6 +99,11 @@ alignBtnEl.onclick = function(){
 		runAeneasComand(config, function(srtFilePath){
 
 			textBoxEl.innerText =fs.readFileSync(srtFilePath).toString();	
+
+				//clear up 
+				fs.unlinkSync(outPutSegmentedFile);
+				fs.unlinkSync(textFile);
+				fs.unlinkSync(srtFilePath);
 
 				makeSrtTimeCodesIntoLinks();
 				addLinksToSrtTimecodes();
@@ -215,7 +220,8 @@ loadYoutubeUrlBtnEl.onclick = function(e){
 	// var captionsFiles = downloadCaptions(url);
 	// console.log(captionsFiles);
 	// var captionsContent = openFile(captionsFiles[0]);
-	loadEditorWithDummyText();
+	
+	// loadEditorWithDummyText();
 };
 
 

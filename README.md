@@ -1,5 +1,7 @@
 # Captioning app. 
 
+Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](http://textAV.tech) event.
+
 ## TODO
 - [x] aenes installation script to run on startup //using external dmg project
 	Eg save status in app data folder, eg boolean setupCompleted = true/false

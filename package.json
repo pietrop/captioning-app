@@ -1,9 +1,11 @@
 {
-  "name": "electron-quick-start",
+  "name": "caption-maker",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
+    "pack:mac": "build --dir --mac --x64",
+    "build:mac": "build --mac --x64",
     "start": "electron ."
   },
   "repository": "https://github.com/electron/electron-quick-start",
@@ -14,13 +16,42 @@
     "tutorial",
     "demo"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "author": "Pietro Passarelli",
+  "license": "MIT",
   "devDependencies": {
-    "electron": "~1.6.2"
+    "electron": "~1.6.2",
+    "electron-builder": "^19.16.2"
+  },
+  "build": {
+    "appId": "org.otranscribe.otranscribe-electron",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "build/icon.ico"
+    }
   },
   "dependencies": {
     "electron-in-page-search": "^1.2.3",
+    "shell-escape": "^0.2.0",
     "subtitle_scraper": "^1.2.0",
     "youtube-dl": "^1.11.1",
     "youtube-video-js": "^1.6.2"

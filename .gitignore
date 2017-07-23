@@ -2,6 +2,9 @@
 
 dist/
 
+tmp/*.txt
+tmp/*.srt
+
 # app.js in electron folder is generated with browserify using the npm comands.
 electron/app.js
 
