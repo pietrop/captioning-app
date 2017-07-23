@@ -26,14 +26,21 @@ Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](ht
 
 - [ ] add `vtt` track (see if it is possible to update) to preview captions on video element.
 
-##  Screenshots
+##  Screenshots and usage
+
+Select a file, for now HTML5 media compatible, `mp4`,`wav`, `webm`, `ogg`, etc..
 
 ![caption-maker home screen](docs/img/caption-maker-1.png)
 
+Type or copy and paste from automated service (eg[autoEdit.io](http://autoEdit.io))
+
 ![caption-maker text editing](docs/img/caption-maker-2.png)
+
+click `align` to get a preview of an srt file, with clicable timecodes.
 
 ![caption-maker srt preview](docs/img/caption-maker-3.png)
 
+Review if anychanges to time and text are needed, and click `export` to save the srt file on the desktop.
 
 
 ###  R&D Resources
