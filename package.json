@@ -18,5 +18,11 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.6.2"
+  },
+  "dependencies": {
+    "electron-in-page-search": "^1.2.3",
+    "subtitle_scraper": "^1.2.0",
+    "youtube-dl": "^1.11.1",
+    "youtube-video-js": "^1.6.2"
   }
 }
