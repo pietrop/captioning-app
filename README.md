@@ -63,3 +63,28 @@ Review if anychanges to time and text are needed, and click `export` to save the
 
 - [ ] add `vtt` track (see if it is possible to update) to preview captions on video element.
 
+
+- [ ] add punctuaiton button, with warning that removes existing punctuation and then adds new one (?).
+
+
+- [ ] Error handling if youtube video does not have any transcriptions. add to text editor "Seems like this video does not have any transcriptions".
+
+- [ ] If youtube captions have accurate human captions, display those instead of the automatic once. Find a way to check in results what you get. 
+
+- [ ] youtube captions, language preference.
+
+- [ ] Need to add Error handling and checks for when async operations are happening, eg downloading the video or the captions. 
+
+<!-- Some code notes
+
+
+
+
+
+//to add captions dynamically  - Might not be needed as a requiremen
+// maybe add button, update captions preview. or auto trigger. 
+// might need to write the `vtt` file. and then code below to update on video.
+// altho it better if video was bigger. 
+// document.querySelector("video").innerHTML = '<track label="English Captions" srclang="en" kind="captions" src="/Users/pietropassarelli/Dropbox/CODE/NODE/webVideoTextCrawler/test/results.vtt" type="text/vtt" default />'
+
+ -->

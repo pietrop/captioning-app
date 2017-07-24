@@ -8,37 +8,33 @@ const fs = require('fs');
 const path = require('path');
 const electron = require('electron');
 const exec = require('child_process').exec;
-
+const webvtt = require('node-webvtt-youtube');
 const {dialog} = require('electron').remote;
+const tokenizer = require('sbd');
 var currentWindow = electron.remote.getCurrentWindow();
 var electronShell = require("electron").shell;
 var dataPath = currentWindow.dataPath.replace(/ /g,"\\ "); 
 var desktopPath = currentWindow.desktopPath;
 var appPath = currentWindow.appPath;
-console.log("appPath",appPath);
 
+console.log("appPath",appPath);
 console.log("dataPath",dataPath);
 
 var alignBtnEl = document.getElementById('alignBtn');
 var exportSrtBtnEl = document.getElementById('exportSrtBtn');
-
 var selectFileBtnEl = document.getElementById('selectFileBtn');
 var loadYoutubeUrlBtnEl = document.getElementById('loadYoutubeUrlBtn');
 var videoYoutubeUrlInputEl = document.getElementById('videoYoutubeUrlInput');
-
 var videoPreviewEl = document.getElementById('videoPreview');
-
 var textBoxEl = document.getElementById('textBox');
-
 var checkboxInputEl = document.getElementById('checkboxInput');
 
 var timeout = null;
 var resumeTiypingTimeInterval = 600;
-var startStopPlayingVideoOntyping = true;
-
+var startStopPlayingVideoOntyping = false;
 var isYoutubeVideo = false;
-
-var sourceVideoPath ="";
+var sourceVideoPath ="tempCaptionsMakerFile";
+window.sourceVideoPath = sourceVideoPath;
 
 
 checkboxInputEl.onclick = function(e){
@@ -63,6 +59,44 @@ selectFileBtnEl.onclick = function(){
 	});
 };
 
+loadYoutubeUrlBtnEl.onclick = function(e){
+	e.preventDefault();
+	isYoutubeVideo = true;
+	disableTextEditorProgressMessage();
+	var url = videoYoutubeUrlInputEl.value;
+	//TODO: add validation to check it's a valid youtube URL.
+	var youtubeId = youtubeUrlExtractId(url);
+	populateYoutubePlayer(youtubeId);
+
+	//TODO: can I use path .join here to add extension to name?
+	// var destFileName = dataPath+"/"+ youtubeId+".mp4";
+	 // sourceVideoPath = destFileName;
+	downloadYoutubeVideo(url, function(destPath){
+		sourceVideoPath = destPath;
+		console.log("sourceVideoPath+ ",sourceVideoPath)
+	
+		downloadCaptions(url, function(captionFiles){
+			if (captionFiles.length ==0){
+				alert("This video has no captions");
+			}else{
+				var captionFile = captionFiles[0];
+				console.log("1,openYoutubeVttFile");
+				openYoutubeVttFile(path.join(dataPath,captionFile));
+				// var captionsContent = openFile(captionFiles[0]);
+				
+				console.log(captionFile);
+				
+			}
+		});	
+	});
+	
+	
+	// console.log(captionsFiles);
+	// var captionsContent = openFile(captionsFiles[0]);
+	
+	// loadEditorWithDummyText();
+};
+
 
 exportSrtBtnEl.onclick = function(){
 	//assumes allignment has been run, perhaps add a boolean flag to check that it is the case. 
@@ -83,6 +117,7 @@ alignBtnEl.onclick = function(){
 	var textFile = createTextFileFromTextEditor();
 	var fileName = path.basename(sourceVideoPath);
 	var outPutSegmentedFile =   dataPath+"/"+fileName+"._segmented"+".txt";
+	console.log("sourceVideoPath in alignBtnEl ", sourceVideoPath);
 	console.log('outPutSegmentedFile',outPutSegmentedFile);
 	//should call perl scrip to prep on textfile to prep it for aeneas
 	
@@ -97,16 +132,22 @@ alignBtnEl.onclick = function(){
 		textFile : textFile
 	};
 
-	segmentTranscript(config, function(resp){
+	segmentTranscript(config, function(respSegmentedFileContent){
+
+		// fs.writeFileSync(outPutSegmentedFile,respSegmentedFileContent );
+
+		// config.outPutSegmentedFile = respSegmentedFilePath; 
+		console.log('config.outPutSegmentedFile',config.outPutSegmentedFile);
 
 		runAeneasComand(config, function(srtFilePath){
+			console.log("srtFilePath",srtFilePath);
 
-			textBoxEl.innerText =fs.readFileSync(srtFilePath).toString();	
+			textBoxEl.innerText =fs.readFileSync(srtFilePath,'utf8').toString('utf8');	
 
 				//clear up 
-				fs.unlinkSync(outPutSegmentedFile);
-				fs.unlinkSync(textFile);
-				fs.unlinkSync(srtFilePath);
+				// fs.unlinkSync(outPutSegmentedFile);
+				// fs.unlinkSync(textFile);
+				// fs.unlinkSync(srtFilePath);
 
 				makeSrtTimeCodesIntoLinks();
 				addLinksToSrtTimecodes();
@@ -202,34 +243,55 @@ function setVideoCurrentTime(timecode){
 		var iframe = document.querySelector('iframe');
 		var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 		// innerDoc.querySelectorAll('video')[0].click();
-		innerDoc.querySelectorAll('video')[0].currentTime = time ;
+		innerDoc.querySelectorAll('video')[0].currentTime = time;
+		playVideo();
 
 	}else{
 		var video = document.querySelector('video');
 		video.currentTime = time ;
+		playVideo();
 	}
 }
 
 
 
-loadYoutubeUrlBtnEl.onclick = function(e){
-	e.preventDefault();
-	isYoutubeVideo = true;
-	var url = videoYoutubeUrlInputEl.value;
-	//TODO: add validation to check it's a valid youtube URL.
-	var youtubeId = youtubeUrlExtractId(url);
-	populateYoutubePlayer(youtubeId);
 
-	// var captionsFiles = downloadCaptions(url);
-	// console.log(captionsFiles);
-	// var captionsContent = openFile(captionsFiles[0]);
+function openYoutubeVttFile(path){
+	console.log("2,openYoutubeVttFile");
+	var vttFileContent = openFile(path);
+	console.log(path,vttFileContent);
+	//Do some parting
 	
-	// loadEditorWithDummyText();
-};
+	var parsed = parseYoutubeVtt(vttFileContent);
+	//add punctuation 
+	punctuatorPostRequest(parsed, function(respText){
+		console.log('respText',JSON.stringify(respText,null,2))
+		setTextBoxContent(respText);
+
+		textEditorContentEditable(true);
+	});
+	
+}
+
+
+function parseYoutubeVtt(vtt){
+	var vttJSON =webvtt.parse(vtt);
+	var result ="";
+	vttJSON.cues.forEach(function(line, index){
+		result+= parseYoutubeVttTextLine(line.text)+" ";
+	})
+	return result;
+}
+
+
+function parseYoutubeVttTextLine(textLine){
+	//used http://scriptular.com/
+	return textLine.replace(/<[A-z|.|0-9|:|/]*>/g,"");
+}
 
 
 function openFile(path){
-	return fs.readFileSync(path).toString('utf-8');
+	return fs.readFileSync(path,'utf8').toString('utf-8');
 }
 
 
@@ -242,26 +304,71 @@ Mauris pellentesque orci at tellus porttitor, eu tempus urna sodales. Praesent e
 
 }
 
-function downloadCaptions(url){
-
+function downloadCaptions(url,cb){
+	console.log("downloadCaptions");
   var options = {
     // Write automatic subtitle file (youtube only)
     auto: true,
     // Downloads all the available subtitles.
-    all: true,
+    all: false,
     // Languages of subtitles to download, separated by commas.
     lang: 'en',
+    // format: 'srt/vtt',
     // The directory to save the downloaded files in.
     cwd: dataPath,
   };
 
   youtubedl.getSubs(url, options, function(err, files) {
     if (err) throw err;
+
+    if(cb){cb(files);}
     // setCaptionsStatus(subtitlesDownloadedMessage);
     console.info('subtitle files downloaded:', files);
     return files;
   });
 }
+
+
+
+function downloadYoutubeVideo(url, cb){
+	//update user GUI on status of download
+  // setStatusElement(downloadingMessage);
+  // reset captions status
+  // setCaptionsStatus('...');
+	var destFilePathName; 
+
+  //setup download with youtube-dl
+  var video = youtubedl(url,
+    // Optional arguments passed to youtube-dl. 
+    // see here for options https://github.com/rg3/youtube-dl/blob/master/README.md
+    ['--format=best'],
+    // Additional options can be given for calling `child_process.execFile()`. 
+    { cwd: dataPath });
+
+  //listener for video info, to get file name 
+  video.on('info', function(info) {
+  	console.log("video-info",JSON.stringify(info,null,2));
+    destFilePathName =  path.join(dataPath,info._filename.replace(/ /g,"_"));//info._filename); 
+  	console.log("destFilePathName-",destFilePathName);
+    // update GUI with info on the file being downloaded 
+    // setInfoPanel('<div class="alert alert-dismissible alert-success"><strong>Filename: </strong>' + info._filename+'<br><strong>size: </strong>' + info.size+'<br>'+'<strong>Destination: </strong>'+destFilePathName+"</div>");
+
+    //TODO: sanilitse youtube file name so that it can be 
+
+    //save file locally 
+    var writeStream = fs.createWriteStream(destFilePathName);
+    video.pipe(writeStream);
+  });
+
+
+  video.on('end', function() {
+    //TODO: replace with update Div symbol
+    // setStatusElement(finishedDownloadingMessage);
+    if(cb){cb(destFilePathName)};
+  });
+
+}
+
 
 
 
@@ -296,7 +403,8 @@ function populateYoutubePlayer(id){
 		var iframe = document.querySelector('iframe');
 		var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 		//start video 
-		innerDoc.querySelectorAll('video')[0].click();
+		//TODO: decide whether to enable this or not. maybe make as an option?
+		// innerDoc.querySelectorAll('video')[0].click();
 		
 		initializeVideoPlayPuaseTypingPreferences();
 	};
@@ -310,8 +418,13 @@ function playVideo(){
 	if(isYoutubeVideo){
 		var iframe = document.querySelector('iframe');
 		var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-		// innerDoc.querySelectorAll('video')[0].click();
-		innerDoc.querySelectorAll('video')[0].play();
+
+		if(innerDoc.querySelectorAll('video')[0].src ==""){
+			innerDoc.querySelectorAll('video')[0].click();
+		}else{
+			innerDoc.querySelectorAll('video')[0].play();
+		}
+		
 	}else{
 		var video = document.querySelector('video');
 		video.play();
@@ -349,41 +462,14 @@ function runAeneasComand(config,cb){
 	var outputCaptionFile = dataPath+"/"+fileName+"."+captionFileFormat;
 	console.log(JSON.stringify(config,null,2));
 
-	var aeneasComandString = `aeneas_execute_task "${mediaFile}" "${textFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`//.srt
-	// var aeneasComandString = `aeneas_execute_task "/Users/pietropassarelli/Desktop/tmp19Jul17/TMP2/Demo_media/Vox.com/norman_door/norman_door_trimmed2.mp4" "/Users/pietropassarelli/Desktop/electron-quick-start/norman_door_trimmed2.mp4.txt" "task_language=eng|os_task_file_format=srt|is_text_type=subtitles|is_audio_file_head_length=0|is_audio_file_tail_length=0|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ./new2_ocb_example.srt `
-	// const { exec } = require('child_process');
 
-	// exec(aeneasComandString, (err, stdout, stderr) => {
-	//   if (err) {
-	//     // node couldn't execute the command
-	//     return;
-	//   }
+	var outPutSegmentedFile = config.outPutSegmentedFile;
 
-	//   // the *entire* stdout and stderr (buffered)
-	//   console.log(`stdout: ${stdout}`);
-	//   console.log(`stderr: ${stderr}`);
-	// });
-	 
-	
-	// const { spawn } = require('child_process');
-	// const ls = spawn('aeneas_execute_task',[mediaFile, textFile, 'task_language',language, 'os_task_file_format',captionFileFormat,'is_text_type','subtitles','is_audio_file_head_length',audio_file_head_length,'is_audio_file_tail_length',audio_file_tail_length,'task_adjust_boundary_nonspeech_min',1.000,'task_adjust_boundary_nonspeech_string','REMOVE','task_adjust_boundary_algorithm','percent','task_adjust_boundary_percent_value',75,'is_text_file_ignore_regex','[*]',mediaFile+"."+captionFileFormat]);//'PYTHONIOENCODING','UTF-8'
-
-	// ls.stdout.on('data', (data) => {
-	//   console.log(`stdout: ${data}`);
-	// });
-
-	// ls.stderr.on('data', (data) => {
-	//   console.log(`stderr: ${data}`);
-	// });
-
-	// ls.on('close', (code) => {
-	//   console.log(`child process exited with code ${code}`);
-	// });
-	 
+	var aeneasComandString = `aeneas_execute_task "${mediaFile}" "${outPutSegmentedFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`;
 	
 	exec(aeneasComandString, function(error, stdout, stderr) {
-	    console.log('stdout: ' + stdout);
-	    console.log('stderr: ' + stderr);
+	    console.log('stdout runAeneasComand: ' + stdout);
+	    console.log('stderr runAeneasComand: ' + stderr);
 	    if(cb){cb(outputCaptionFile)};
 	    if (error !== null) {
 	        console.log('exec error: ' + error);
@@ -392,45 +478,84 @@ function runAeneasComand(config,cb){
 }
 
 
+window.segmentTranscript = segmentTranscript;
 
 function segmentTranscript(config,cb){
 	var inputFile 				= config.textFile;
 	var outPutSegmentedFile 	= config.outPutSegmentedFile;
-	var segmentTranscriptComand =`perl ${appPath}/sentence-boundary.pl -d {appPath}/HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
-		exec(segmentTranscriptComand, function(error, stdout, stderr) {
-		if(cb){cb(outPutSegmentedFile)}
-	    console.log('stdout: ' + stdout);
-	    console.log('stderr: ' + stderr);
-	    if (error !== null) {
-	        console.log('exec error: ' + error);
-	    }
-	});
+	// var segmentTranscriptComand =`perl ${appPath}/sentence-boundary.pl -d ${appPath}/HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
+	  sentenceBoundariesDetection(inputFile,outPutSegmentedFile, function(filePathSetencesWithLines){
+
+
+	 	// var segmentTranscriptComand = `${appPath}/segmenter.sh ${filePathSetencesWithLines}`;
+	 	// console.log("segmentTranscriptComand",segmentTranscriptComand);
+
+	 	//fold -w 35 -s  "$f" 
+	 
+	 	// sentenceBoundariesDetection(filePathSetencesWithLines, function(respSentenceLineSegmentedFilePaht){
+
+			if(cb){cb(filePathSetencesWithLines);}
+	 	// })
+
+	 	
+	 
+		// exec(segmentTranscriptComand, function(error, stdout, stderr) {
+		// 	if(cb){cb(outPutSegmentedFile);}
+		//     console.log('stdout Perl Script: ' + stdout);
+		//     console.log('stderr Perl Script: ' + stderr);
+		//     if (error !== null) {
+		//         console.log('exec error Perl Script: ' + error);
+		//     }
+		// });
+
+
+
+	 });
+
+	
+	// TODO: refactor this 
+	
+
+}
+
+function sentenceBoundariesDetection(textFile,outPutSegmentedFile,cb){
+	var options = {
+	    "newline_boundaries" : true,
+	    "html_boundaries"    : false,
+	    "sanitize"           : false,
+	    "allowed_tags"       : false,
+	    //TODOHere could open HONORIFICS file and pass them in here I think 
+	    "abbreviations"      : null 
+	};
+
+	var text = fs.readFileSync(textFile).toString('utf8');
+	var sentences = tokenizer.sentences(text, options);
+	console.log("sentences",sentences);
+	var sentencesWithLineSpaces=sentences.join("\n\n");
+	console.log("sentencesWithLineSpaces",sentencesWithLineSpaces);
+
+	//TODO: extra manupulation of text 
+	//2. The 2nd line (pictured) takes each of sentences (now separated by an empty line) 
+	//and places a new line mark at the end of the word that exceeds > 35 characters 
+	//(if the sentence exceeds that number)
+	//# Break each line at 35 characters
+	//fold -w 35 -s test2.txt > test3.txt
+	
+
+	//3. Then the Perl command (3rd line pictured) will take these new chunks 
+	//and separate them further so that there are no more than two consecutive lines before an empty line.
+	//# Insert new line for every two lines, preserving paragraphs
+	// perl -00 -ple 's/.*\n.*\n/$&\n/mg' test3.txt > "$f"
+
+
+
+
+	fs.writeFileSync(outPutSegmentedFile,sentencesWithLineSpaces );
+	// if(cb){cb(sourceVideoPath)};
+	if(cb){cb(outPutSegmentedFile)};
 }
 
 
-// var timeMs = function(val) {
-//     var regex = /(\d+):(\d{2}):(\d{2}),(\d{3})/;
-//     var parts = regex.exec(val);
-
-//     if (parts === null) {
-//         return 0;
-//     }
-
-//     for (var i = 1; i < 5; i++) {
-//         parts[i] = parseInt(parts[i], 10);
-//         if (isNaN(parts[i])) parts[i] = 0;
-//     }
-
-//     // hours + minutes + seconds + ms
-//     return parts[1] * 3600000 + parts[2] * 60000 + parts[3] * 1000 + parts[4];
-// };
-
-// var timeSeconds = function(val) {
-
-//     var milliseconds =  timeMs(val);
-//     var seconds = milliseconds / 1000.0;
-//     return seconds; 
-// };
 
 function convertTimeCodeToSeconds(timeString){
 
@@ -447,6 +572,50 @@ function convertTimeCodeToSeconds(timeString){
   //alert(timeString + " = " + totalTime)
   return totalTime;
 }
+
+// window.punctuatorPostRequest = punctuatorPostRequest;
+//TODO: this could be refactored into 
+function punctuatorPostRequest(content, cb){
+	var tmpPunctuationFile =sourceVideoPath+".punctuation.txt";  //"~/Desktop/textTEST.txt"
+	var comand = `curl -d "text=${content}" http://bark.phon.ioc.ee/punctuator > ${tmpPunctuationFile}`
+	exec(comand, function(error, stdout, stderr) {
+		var resultTextWithPunctuation = openFile(tmpPunctuationFile);
+		if(cb){cb(resultTextWithPunctuation)}
+	   	console.log('stdout punctuatorPostRequest: ' + stdout);
+	    console.log('stderr punctuatorPostRequest: ' + stderr);
+	    if (error !== null) {
+	        console.log('exec error: ' + error);
+	    }
+	});
+
+}
+
+function disableTextEditorProgressMessage(){
+	 textEditorContentEditable(false, "<i>Transcription in progress...</i>")
+}
+
+
+function textEditorContentEditable(editable, message){
+	if(message){
+		textBoxEl.innerHTML = message;
+	}	
+	textBoxEl.contentEditable = editable;	
+}
+
+//TODO: add a button and onclick listener that points to this function 
+function resetPunctuation(){
+	var text = textBoxEl.innerText;
+	// confirm("warning this removes timecodes and current puctuation").
+	
+	//remove any timecode
+	
+	// remove any pucntuation . , ! ?
+	
+	//call punctuator and reset punctuation
+	
+	//add to text box
+}
+
 
 //TODO: disable while speech to text 
 //textBoxEl.innerHTML = "<i>Transcription in progress...</i>"
