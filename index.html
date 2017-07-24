@@ -14,6 +14,8 @@
   </head>
   <body>
 
+
+
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -57,6 +59,11 @@
          <!-- <br><br> -->
       <div id="videoPreview" class="embed-responsive embed-responsive-16by9">
       </div>
+
+<br><br>
+      <div id="demoNoticeDiv"></div>
+
+
     <!--   <div id="player"></div> -->
     </div>
     <div class="col-xs-12 col-sm-7  col-md-7  col-lg-7">
@@ -121,6 +128,7 @@
 
 
 
+
     </div>
   </div>
 </div>
@@ -149,6 +157,16 @@ body{
       require('./renderer.js')
     }else{
       // run demo code. 
+//////////////////////////////////////////////////////////
+// demo notice
+var demoNotice =`<div class="alert alert-dismissible alert-warning">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <h4>Dummy Demo!</h4>
+  <p>This is a dummy demo of the app, not all the feature work, and it's for demonstratioon purposes only, it is not a web app. click on <b>load</b> and then <b>align</b> for a demonstration of what the app can do.
+  For any questions feel free to get in touch, via <a href="mailto:pietro.passarelli@gmail.com">email</a> or <a href="https://twitter.com/pietropassarell" target="_blank">@pietropassarell</a></p>
+</div>`;
+
+document.getElementById('demoNoticeDiv').innerHTML = demoNotice;
       // on click of youtube video load populate video player
       // populate with dummy text
       // Align populate with dummy srt text example
@@ -190,23 +208,23 @@ loadYoutubeUrlBtnEl.onclick = function(e){
   //TODO: can I use path .join here to add extension to name?
   // var destFileName = dataPath+"/"+ youtubeId+".mp4";
    // sourceVideoPath = destFileName;
-  downloadYoutubeVideo(url, function(destPath){
-    sourceVideoPath = destPath;
-    console.log("sourceVideoPath+ ",sourceVideoPath)
+  // downloadYoutubeVideo(url, function(destPath){
+  //   sourceVideoPath = destPath;
+  //   console.log("sourceVideoPath+ ",sourceVideoPath)
   
-    downloadCaptions(url, function(captionFiles){
-      if (captionFiles.length ==0){
-        alert("This video has no captions");
-      }else{
-        var captionFile = captionFiles[0];
-        console.log("1,openYoutubeVttFile");
-        openYoutubeVttFile(path.join(dataPath,captionFile));
-        // var captionsContent = openFile(captionFiles[0]);
+  //   downloadCaptions(url, function(captionFiles){
+  //     if (captionFiles.length ==0){
+  //       alert("This video has no captions");
+  //     }else{
+  //       var captionFile = captionFiles[0];
+  //       console.log("1,openYoutubeVttFile");
+  //       openYoutubeVttFile(path.join(dataPath,captionFile));
+  //       // var captionsContent = openFile(captionFiles[0]);
         
-        console.log(captionFile);
-      }
-    }); 
-  });
+  //       console.log(captionFile);
+  //     }
+  //   }); 
+  // });
 };
 
 function youtubeUrlExtractId(url){
