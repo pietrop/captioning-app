@@ -111,7 +111,7 @@ Review if anychanges to time and text are needed, and click `export` to save the
 
 - [ ] Add timecode in intermediate draft. 
 	Add Timcodes as headings in this view so that it's easier to navigate. 
-	For blind people `5 Minutes` , `10 Minutes` etc.. with value of `00:00:00,100`
+	For blind people `5 Minutes` , `10 Minutes` etc.. with value of `00:05:00,000` (`hh:mm:ss,sss`).
 
 - [ ] Localhost save so that you can pick up where you left. 
 var textBoxEl = document.getElementById('textBox');
@@ -119,6 +119,15 @@ localStorage.tmpTest =  textBoxEl.innerText
 Then to repopulate on load if that is empty. 
 textBoxEl.innerTex = localStorage.tmpTest;
 also need to load the video. save in local storage which video URL it is
+
+
+- [ ] Why bug with this video file? `https://youtu.be/L4TGZdTjPGQ`
+
+<!-- 
+
+https://youtu.be/L4TGZdTjPGQ
+
+ -->
 
 
 
@@ -129,6 +138,9 @@ also need to load the video. save in local storage which video URL it is
 - [ ] auto Save using local storage (text and video url). 
 	- save button 
 	+ save interval with custom field. (optional)
+
+
+- [ ] Move videos in library path.  
 
 <!-- Some code notes
 

@@ -28,7 +28,9 @@ var videoYoutubeUrlInputEl = document.getElementById('videoYoutubeUrlInput');
 var videoPreviewEl = document.getElementById('videoPreview');
 var textBoxEl = document.getElementById('textBox');
 var checkboxInputEl = document.getElementById('checkboxInput');
-
+var saveBtnEl = document.getElementById('saveBtn');
+var restoreLastSavedVersionBtnEl = document.getElementById('restoreLastSavedVersionBtn');
+ 
 var timeout = null;
 var resumeTiypingTimeInterval = 600;
 var startStopPlayingVideoOntyping = false;
@@ -36,6 +38,42 @@ var isYoutubeVideo = false;
 var sourceVideoPath ="tempCaptionsMakerFile";
 window.sourceVideoPath = sourceVideoPath;
 
+
+restoreLastSavedVersionBtnEl.onclick = function(e){
+	e.preventDefault();
+	restoreStateFromLocalStorage();
+};
+
+saveBtnEl.onclick = function(e){
+		e.preventDefault();
+		saveToLocalStorage();
+		alert("saved");
+		// Then to repopulate on load if that is empty. 	
+};
+
+function saveToLocalStorage(){
+	localStorage.captionsMakerState ={}
+	//Horrible to save as HTML without serializing, but if save as TXT looses new line. 
+	//TODO: Welcome sudgestions on how to improve on this
+	localStorage.captionsMakerStateText = textBoxEl.innerHTML;
+	localStorage.captionsMakerStateVideoSrc = sourceVideoPath;
+}
+
+function restoreStateFromLocalStorage(){
+	//TODO: add notice, confirm, this will cancel the current session. do you want to continue? or relax, nothing happend. 
+	if(localStorage.captionsMakerState){
+		setTextBoxContent(localStorage.captionsMakerStateText);
+		//
+		makeSrtTimeCodesIntoLinks();
+		addLinksToSrtTimecodes();
+		//
+		loadHtml5Video(localStorage.captionsMakerStateVideoSrc);
+		isYoutubeVideo = false;
+		sourceVideoPath = localStorage.captionsMakerStateVideoSrc;
+	}else{
+		alert("No previously saved version was found.");
+	}
+}
 
 checkboxInputEl.onclick = function(e){
 	// e.preventDefault();
@@ -73,6 +111,9 @@ loadYoutubeUrlBtnEl.onclick = function(e){
 	 // sourceVideoPath = destFileName;
 	downloadYoutubeVideo(url, function(destPath){
 		sourceVideoPath = destPath;
+		loadHtml5Video(sourceVideoPath);
+		isYoutubeVideo = false;
+
 		console.log("sourceVideoPath+ ",sourceVideoPath)
 	
 		downloadCaptions(url, function(captionFiles){
@@ -517,7 +558,7 @@ function sentenceBoundariesDetection(textFile,outPutSegmentedFile,cb){
 	    "html_boundaries"    : false,
 	    "sanitize"           : false,
 	    "allowed_tags"       : false,
-	    //TODOHere could open HONORIFICS file and pass them in here I think 
+	    //TODO: Here could open HONORIFICS file and pass them in here I think 
 	    "abbreviations"      : null 
 	};
 
@@ -608,6 +649,8 @@ function resetPunctuation(){
 	
 	//add to text box
 }
+
+
 
 
 //TODO: disable while speech to text 
