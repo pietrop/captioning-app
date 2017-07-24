@@ -77,9 +77,61 @@ Review if anychanges to time and text are needed, and click `export` to save the
 
 - [ ] youtube captions, language preference.
 
+- [ ] alignement language preference (for espeek) button is there, need to be passed as param to aeneas
+
 - [ ] Need to add Error handling and checks for when async operations are happening, eg downloading the video or the captions. 
 
+
+- [ ] consider adding timecodes eg <00:00:00,120> in pre-aligned transcription, every so ofter, eg every paragraph. to make it easier to navigate.
+
+- [ ] add to side panel info about using notation `[Speaker Name]` to identify speakers in the text. 
+
+- [ ] add `landmark regions` regions for accessibility. 
+
+- [ ] add STT service. Decide which one. 
+
+- [ ] Check accuracy of working with Honorifics when segmenting lines. function `sentenceBoundariesDetection()`
+- [ ] find comprehensive list of honorifics. eg 150. add to `HONORIFICS` file by Joseph in this repo. 
+
+- [ ] Move temp files onto another data dir, eg in library. 
+
+- [ ] REFACTOR: Remove write to file as step in code in `render.js` to pass data in between things
+
+- [ ] Error handling 
+
+
+
+- [ ] Save function?
+
+- [ ] Download youtube video and use that for preview? (for offline porpusoses)
+
+- [ ] Tab key, focus indicator styling, yellow indicator around focus element.
+- [ ] Make select file button accessible with Tab key
+
+
+- [ ] Add timecode in intermediate draft. 
+	Add Timcodes as headings in this view so that it's easier to navigate. 
+	For blind people `5 Minutes` , `10 Minutes` etc.. with value of `00:00:00,100`
+
+- [ ] Localhost save so that you can pick up where you left. 
+var textBoxEl = document.getElementById('textBox');
+localStorage.tmpTest =  textBoxEl.innerText
+Then to repopulate on load if that is empty. 
+textBoxEl.innerTex = localStorage.tmpTest;
+also need to load the video. save in local storage which video URL it is
+
+
+
+## Before first release
+
+- [ ] Adjust the segmentation alogirth pre-alignement with last two steps
+- [ ] Switch youtube to local copy of viedeo downloaded with youtube-dl
+- [ ] auto Save using local storage (text and video url). 
+	- save button 
+	+ save interval with custom field. (optional)
+
 <!-- Some code notes
+
 
 
 

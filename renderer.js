@@ -85,16 +85,9 @@ loadYoutubeUrlBtnEl.onclick = function(e){
 				// var captionsContent = openFile(captionFiles[0]);
 				
 				console.log(captionFile);
-				
 			}
 		});	
 	});
-	
-	
-	// console.log(captionsFiles);
-	// var captionsContent = openFile(captionsFiles[0]);
-	
-	// loadEditorWithDummyText();
 };
 
 
