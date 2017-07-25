@@ -171,8 +171,9 @@ alignBtnEl.onclick = function(){
 		console.log("LDLDL",fs.readFileSync(respSegmentedFileContent ).toString());
 
 		// config.outPutSegmentedFile = respSegmentedFilePath; 
-		console.log('config.outPutSegmentedFile',config.outPutSegmentedFile);
+		
 		config.outPutSegmentedFile = respSegmentedFileContent;
+		console.log('config.outPutSegmentedFile',config.outPutSegmentedFile);
 
 		runAeneasComand(config, function(srtFilePath){
 			console.log("srtFilePath",srtFilePath);
