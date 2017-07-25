@@ -168,10 +168,11 @@ alignBtnEl.onclick = function(){
 
 	segmentTranscript(config, function(respSegmentedFileContent){
 
-		// fs.writeFileSync(outPutSegmentedFile,respSegmentedFileContent );
+		console.log("LDLDL",fs.readFileSync(respSegmentedFileContent ).toString());
 
 		// config.outPutSegmentedFile = respSegmentedFilePath; 
 		console.log('config.outPutSegmentedFile',config.outPutSegmentedFile);
+		config.outPutSegmentedFile = respSegmentedFileContent;
 
 		runAeneasComand(config, function(srtFilePath){
 			console.log("srtFilePath",srtFilePath);
@@ -520,30 +521,7 @@ function segmentTranscript(config,cb){
 	// var segmentTranscriptComand =`perl ${appPath}/sentence-boundary.pl -d ${appPath}/HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
 	  sentenceBoundariesDetection(inputFile,outPutSegmentedFile, function(filePathSetencesWithLines){
 
-
-	 	// var segmentTranscriptComand = `${appPath}/segmenter.sh ${filePathSetencesWithLines}`;
-	 	// console.log("segmentTranscriptComand",segmentTranscriptComand);
-
-	 	//fold -w 35 -s  "$f" 
-	 
-	 	// sentenceBoundariesDetection(filePathSetencesWithLines, function(respSentenceLineSegmentedFilePaht){
-
 			if(cb){cb(filePathSetencesWithLines);}
-	 	// })
-
-	 	
-	 
-		// exec(segmentTranscriptComand, function(error, stdout, stderr) {
-		// 	if(cb){cb(outPutSegmentedFile);}
-		//     console.log('stdout Perl Script: ' + stdout);
-		//     console.log('stderr Perl Script: ' + stderr);
-		//     if (error !== null) {
-		//         console.log('exec error Perl Script: ' + error);
-		//     }
-		// });
-
-
-
 	 });
 
 	
@@ -568,25 +546,52 @@ function sentenceBoundariesDetection(textFile,outPutSegmentedFile,cb){
 	var sentencesWithLineSpaces=sentences.join("\n\n");
 	console.log("sentencesWithLineSpaces",sentencesWithLineSpaces);
 
+	//TODO: replace the system calls, unix fold, perl etc.. with js modules for segmentations. 
+
 	//TODO: extra manupulation of text 
 	//2. The 2nd line (pictured) takes each of sentences (now separated by an empty line) 
 	//and places a new line mark at the end of the word that exceeds > 35 characters 
 	//(if the sentence exceeds that number)
 	//# Break each line at 35 characters
-	//fold -w 35 -s test2.txt > test3.txt
 	
+	//fold -w 35 -s test2.txt > test3.txt
+	var outPutSegmentedFile2 = outPutSegmentedFile+"2.txt";
+	exec(`fold -w 35 -s ${outPutSegmentedFile} > ${outPutSegmentedFile2}`, function(error, stdout, stderr) {
+		// if(cb){cb(outPutSegmentedFile);}
+	    console.log('stdout Segmented Script: ' + stdout);
+	    console.log('stderr Segmented Script: ' + stderr);
+	    if (error !== null) {
+	        console.log('exec error Perl Script: ' + error);
+	    }
+	    // fs.read
+	    // fs.writeFileSync(outPutSegmentedFile2,sentencesWithLineSpaces );
+		// if(cb){cb(sourceVideoPath)};
+		
+		//3. Then the Perl command (3rd line pictured) will take these new chunks 
+		//and separate them further so that there are no more than two consecutive lines before an empty line.
+		//# Insert new line for every two lines, preserving paragraphs
+		// perl -00 -ple 's/.*\n.*\n/$&\n/mg' test3.txt > "$f"
+		var outPutSegmentedFile3 = outPutSegmentedFile+"3.txt";
+		exec(`perl -00 -ple 's/.*\n.*\n/$&\n/mg' ${outPutSegmentedFile2} > ${outPutSegmentedFile3}`, function(error, stdout, stderr) {
+			 console.log('stdout Segmented Script: ' + stdout);
+		    console.log('stderr Segmented Script: ' + stderr);
+		    if (error !== null) {
+		        console.log('exec error Perl Script: ' + error);
+		    }
+			
+			if(cb){cb(outPutSegmentedFile3)};
 
-	//3. Then the Perl command (3rd line pictured) will take these new chunks 
-	//and separate them further so that there are no more than two consecutive lines before an empty line.
-	//# Insert new line for every two lines, preserving paragraphs
-	// perl -00 -ple 's/.*\n.*\n/$&\n/mg' test3.txt > "$f"
+		});
+
+	});
 
 
 
 
-	fs.writeFileSync(outPutSegmentedFile,sentencesWithLineSpaces );
-	// if(cb){cb(sourceVideoPath)};
-	if(cb){cb(outPutSegmentedFile)};
+
+
+
+	
 }
 
 

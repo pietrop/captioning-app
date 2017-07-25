@@ -134,9 +134,10 @@ https://youtu.be/L4TGZdTjPGQ
 ## Before first release
 
 - [ ] Adjust the segmentation alogirth pre-alignement with last two steps
-- [ ] Switch youtube to local copy of viedeo downloaded with youtube-dl
-- [ ] auto Save using local storage (text and video url). 
-	- save button 
+- [x] Switch youtube to local copy of viedeo downloaded with youtube-dl
+- [ ] Save using local storage (text and video url). 
+	-[X] save button 
+	+ auto save
 	+ save interval with custom field. (optional)
 
 
