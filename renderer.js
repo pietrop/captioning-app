@@ -502,9 +502,11 @@ function runAeneasComand(config,cb){
 	// console.log(JSON.stringify(config,null,2));
 	var outPutSegmentedFile = config.outPutSegmentedFile;
 	console.log("Aeneas outPutSegmentedFile",outPutSegmentedFile);
+	///usr/local/bin/aeneas_execute_task
 	var aeneasComandString = `/usr/local/bin/aeneas_execute_task "${mediaFile}" "${outPutSegmentedFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`;
+	var productionEnv = Object.create(process.env);
 	
-	exec(aeneasComandString, function(error, stdout, stderr) {
+	exec(aeneasComandString,{env: productionEnv}, function(error, stdout, stderr) {
 	    console.log('stdout runAeneasComand: ' + stdout);
 	    console.log('stderr runAeneasComand: ' + stderr);
 	    if(cb){cb(outputCaptionFile)};

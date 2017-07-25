@@ -43,6 +43,7 @@ Review if anychanges to time and text are needed, and click `export` to save the
 - [electron-quick-start](https://github.com/electron/electron-quick-start)
 - [Youtube-dl increase buffer size](https://github.com/przemyslawpluta/node-youtube-dl/issues/128) `var video = youtubedl('http://www.youtube.com/watch?v=0h-qh9flX2A', ['-f=best'], {cwd: __dirname, maxBuffer: Infinity} )`
 
+- [using spawn function with NODE_ENV=production](https://stackoverflow.com/questions/20825157/using-spawn-function-with-node-env-production)
 
 ## TODO
 - [x] aenes installation script to run on startup //using external dmg project
