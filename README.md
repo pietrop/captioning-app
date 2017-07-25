@@ -41,6 +41,7 @@ Review if anychanges to time and text are needed, and click `export` to save the
 - [If you need to download youtube videos you can use this other app](https://github.com/pietrop/electron-video-downloader) (could be modified to try and scrape the automatic srt captions as well)
 
 - [electron-quick-start](https://github.com/electron/electron-quick-start)
+- [Youtube-dl increase buffer size](https://github.com/przemyslawpluta/node-youtube-dl/issues/128) `var video = youtubedl('http://www.youtube.com/watch?v=0h-qh9flX2A', ['-f=best'], {cwd: __dirname, maxBuffer: Infinity} )`
 
 
 ## TODO
@@ -122,6 +123,7 @@ also need to load the video. save in local storage which video URL it is
 
 
 - [ ] Why bug with this video file? `https://youtu.be/L4TGZdTjPGQ`
+
 
 <!-- 
 

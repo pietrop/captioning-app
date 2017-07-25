@@ -151,8 +151,8 @@ alignBtnEl.onclick = function(){
 	var textFile = createTextFileFromTextEditor();
 	var fileName = path.basename(sourceVideoPath);
 	var outPutSegmentedFile =   dataPath+"/"+fileName+"._segmented"+".txt";
-	console.log("sourceVideoPath in alignBtnEl ", sourceVideoPath);
-	console.log('outPutSegmentedFile',outPutSegmentedFile);
+	// console.log("sourceVideoPath in alignBtnEl ", sourceVideoPath);
+	// console.log('outPutSegmentedFile',outPutSegmentedFile);
 	//should call perl scrip to prep on textfile to prep it for aeneas
 	
 	//TODO add:  if(sourceVideoPath !="")
@@ -168,15 +168,17 @@ alignBtnEl.onclick = function(){
 
 	segmentTranscript(config, function(respSegmentedFileContent){
 
-		console.log("LDLDL",fs.readFileSync(respSegmentedFileContent ).toString());
+		// console.log("LDLDL",fs.readFileSync(respSegmentedFileContent ).toString());
 
 		// config.outPutSegmentedFile = respSegmentedFilePath; 
 		
 		config.outPutSegmentedFile = respSegmentedFileContent;
+
 		console.log('config.outPutSegmentedFile',config.outPutSegmentedFile);
+		console.log("LDLDL",fs.readFileSync(respSegmentedFileContent ).toString());
 
 		runAeneasComand(config, function(srtFilePath){
-			console.log("srtFilePath",srtFilePath);
+			// console.log("srtFilePath",srtFilePath);
 
 			textBoxEl.innerText =fs.readFileSync(srtFilePath,'utf8').toString('utf8');	
 
@@ -199,11 +201,11 @@ alignBtnEl.onclick = function(){
 //return path to file 
 function createTextFileFromTextEditor(){
 	var fileName = path.basename(sourceVideoPath);
-	console.log('fileName',fileName);
+	// console.log('fileName',fileName);
 
 	//TODO: add path.  use path library
 	var tmpTextFileName = dataPath+"/"+ fileName+".txt";
-	console.log('tmpTextFileName',tmpTextFileName)
+	// console.log('tmpTextFileName',tmpTextFileName)
 	fs.writeFileSync(tmpTextFileName, getContentFromTextEditor(),'utf8');
 	return tmpTextFileName; 
 }
@@ -293,7 +295,7 @@ function setVideoCurrentTime(timecode){
 
 
 function openYoutubeVttFile(path){
-	console.log("2,openYoutubeVttFile");
+	// console.log("2,openYoutubeVttFile");
 	var vttFileContent = openFile(path);
 	console.log(path,vttFileContent);
 	//Do some parting
@@ -301,7 +303,7 @@ function openYoutubeVttFile(path){
 	var parsed = parseYoutubeVtt(vttFileContent);
 	//add punctuation 
 	punctuatorPostRequest(parsed, function(respText){
-		console.log('respText',JSON.stringify(respText,null,2))
+		// console.log('respText',JSON.stringify(respText,null,2));
 		setTextBoxContent(respText);
 
 		textEditorContentEditable(true);
@@ -341,7 +343,7 @@ Mauris pellentesque orci at tellus porttitor, eu tempus urna sodales. Praesent e
 }
 
 function downloadCaptions(url,cb){
-	console.log("downloadCaptions");
+	// console.log("downloadCaptions");
   var options = {
     // Write automatic subtitle file (youtube only)
     auto: true,
@@ -378,14 +380,15 @@ function downloadYoutubeVideo(url, cb){
     // Optional arguments passed to youtube-dl. 
     // see here for options https://github.com/rg3/youtube-dl/blob/master/README.md
     ['--format=best'],
+
     // Additional options can be given for calling `child_process.execFile()`. 
-    { cwd: dataPath });
+    { cwd: dataPath, maxBuffer: Infinity });
 
   //listener for video info, to get file name 
   video.on('info', function(info) {
-  	console.log("video-info",JSON.stringify(info,null,2));
+  	// console.log("video-info",JSON.stringify(info,null,2));
     destFilePathName =  path.join(dataPath,info._filename.replace(/ /g,"_"));//info._filename); 
-  	console.log("destFilePathName-",destFilePathName);
+  	// console.log("destFilePathName-",destFilePathName);
     // update GUI with info on the file being downloaded 
     // setInfoPanel('<div class="alert alert-dismissible alert-success"><strong>Filename: </strong>' + info._filename+'<br><strong>size: </strong>' + info.size+'<br>'+'<strong>Destination: </strong>'+destFilePathName+"</div>");
 
@@ -429,7 +432,7 @@ function getTextBoxContent(){
 
 
 function populateYoutubePlayer(id){
-	console.log(id);
+	// console.log(id);
 	//simple implementation 
 	var youtubeElement = `<iframe id="youtubeIframe" width='560' height='315' class='embed-responsive-item' src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
 	// var youtubeElement = `<video width="640" height="360"><source type="video/youtube" src="http://www.youtube.com/watch?v=${id}" /></video>`
@@ -449,7 +452,7 @@ function populateYoutubePlayer(id){
 
 
 function playVideo(){
-	console.log("play video ");
+	// console.log("play video ");
 	// document.querySelector( 'video' ).play();
 	if(isYoutubeVideo){
 		var iframe = document.querySelector('iframe');
@@ -496,12 +499,10 @@ function runAeneasComand(config,cb){
 	// var tmpTextFileName = dataPath +"/"+ fileName;
 	var fileName = path.basename(mediaFile);
 	var outputCaptionFile = dataPath+"/"+fileName+"."+captionFileFormat;
-	console.log(JSON.stringify(config,null,2));
-
-
+	// console.log(JSON.stringify(config,null,2));
 	var outPutSegmentedFile = config.outPutSegmentedFile;
-
-	var aeneasComandString = `aeneas_execute_task "${mediaFile}" "${outPutSegmentedFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`;
+	console.log("Aeneas outPutSegmentedFile",outPutSegmentedFile);
+	var aeneasComandString = `/usr/local/bin/aeneas_execute_task "${mediaFile}" "${outPutSegmentedFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`;
 	
 	exec(aeneasComandString, function(error, stdout, stderr) {
 	    console.log('stdout runAeneasComand: ' + stdout);
@@ -543,10 +544,11 @@ function sentenceBoundariesDetection(textFile,outPutSegmentedFile,cb){
 
 	var text = fs.readFileSync(textFile).toString('utf8');
 	var sentences = tokenizer.sentences(text, options);
-	console.log("sentences",sentences);
+	// console.log("sentences",sentences);
 	var sentencesWithLineSpaces=sentences.join("\n\n");
-	console.log("sentencesWithLineSpaces",sentencesWithLineSpaces);
+	// console.log("sentencesWithLineSpaces",sentencesWithLineSpaces);
 
+	fs.writeFileSync(outPutSegmentedFile,sentencesWithLineSpaces);
 	//TODO: replace the system calls, unix fold, perl etc.. with js modules for segmentations. 
 
 	//TODO: extra manupulation of text 
@@ -574,7 +576,7 @@ function sentenceBoundariesDetection(textFile,outPutSegmentedFile,cb){
 		// perl -00 -ple 's/.*\n.*\n/$&\n/mg' test3.txt > "$f"
 		var outPutSegmentedFile3 = outPutSegmentedFile+"3.txt";
 		exec(`perl -00 -ple 's/.*\n.*\n/$&\n/mg' ${outPutSegmentedFile2} > ${outPutSegmentedFile3}`, function(error, stdout, stderr) {
-			 console.log('stdout Segmented Script: ' + stdout);
+			console.log('stdout Segmented Script: ' + stdout);
 		    console.log('stderr Segmented Script: ' + stderr);
 		    if (error !== null) {
 		        console.log('exec error Perl Script: ' + error);
