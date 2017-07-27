@@ -8,6 +8,8 @@ const fs = require('fs');
 const path = require('path');
 const electron = require('electron');
 const exec = require('child_process').exec;
+const child = require('child_process').execFile;
+const { spawn } = require('child_process');
 const webvtt = require('node-webvtt-youtube');
 const {dialog} = require('electron').remote;
 const tokenizer = require('sbd');
@@ -504,9 +506,14 @@ function runAeneasComand(config,cb){
 	console.log("Aeneas outPutSegmentedFile",outPutSegmentedFile);
 	///usr/local/bin/aeneas_execute_task
 	var aeneasComandString = `/usr/local/bin/aeneas_execute_task "${mediaFile}" "${outPutSegmentedFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`;
-	var productionEnv = Object.create(process.env);
-	
-	exec(aeneasComandString,{env: productionEnv}, function(error, stdout, stderr) {
+	// var productionEnv = Object.create(process.env);
+	var aeneasPath = "/usr/local/bin/aeneas_execute_task";
+	var ffmpegPath = "/usr/local/bin/ffmpeg";
+	var ffprobePath = "/usr/local/bin/ffprobe";
+	var espeakPath = "/usr/local/bin/espeak";
+	var envVar =   {'ffmpeg': ffmpegPath , 'ffprobe': ffprobePath, 'espeak':espeakPath, 'aeneas_execute_task': aeneasPath};
+	var options ={env: envVar, cwd: appPath}
+	exec(aeneasComandString, function(error, stdout, stderr) {
 	    console.log('stdout runAeneasComand: ' + stdout);
 	    console.log('stderr runAeneasComand: ' + stderr);
 	    if(cb){cb(outputCaptionFile)};
@@ -514,6 +521,28 @@ function runAeneasComand(config,cb){
 	        console.log('exec error: ' + error);
 	    }
 	});
+
+	//
+	// var executablePath = "/usr/local/bin/aeneas_execute_task";
+	// var parameters = [mediaFile,outPutSegmentedFile,"task_language",language,"--skip-validator", "os_task_file_format",captionFileFormat,"is_text_type","subtitles", "is_audio_file_head_length",audio_file_head_length,"is_audio_file_tail_length",audio_file_tail_length,"task_adjust_boundary_nonspeech_min",1.000,"task_adjust_boundary_nonspeech_string","REMOVE","task_adjust_boundary_algorithm","percent","task_adjust_boundary_percent_value",75,"is_text_file_ignore_regex","[*]",outputCaptionFile ];
+	// const aeneasProcess = spawn(executablePath, parameters);
+
+	// aeneasProcess.stdout.on('data', (data) => {
+	//   console.log(`Result from aeneasProcess:  ${data}`);
+	// });
+	
+	// var executablePath = "/usr/local/bin/aeneas_execute_task";
+	// var aneneasComand = `${mediaFile} ${outPutSegmentedFile} "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`
+	// // var parameters = [mediaFile,outPutSegmentedFile,"task_language",language,"--skip-validator", "os_task_file_format",captionFileFormat,"is_text_type","subtitles", "is_audio_file_head_length",audio_file_head_length,"is_audio_file_tail_length",audio_file_tail_length,"task_adjust_boundary_nonspeech_min",1.000,"task_adjust_boundary_nonspeech_string","REMOVE","task_adjust_boundary_algorithm","percent","task_adjust_boundary_percent_value",75,"is_text_file_ignore_regex","[*]",outputCaptionFile ];
+	// var parameters = []
+	// parameters.push(aneneasComand);
+	// child(executablePath, parameters, function(err, data) {
+	//      console.log(err)
+	//      console.log("data.toString()",data.toString());
+	//      // fs.writeFileSync(outputCaptionFile,data.toString() ,"utf8");
+	//      if(cb){cb(outputCaptionFile)};
+	// });
+
 }
 
 
@@ -661,7 +690,68 @@ function resetPunctuation(){
 }
 
 
+///Credentials 
 
+ var passwordInput = document.getElementById('password');
+  var usernameInput = document.getElementById('username');
+  var saveCredentialsBtnEl = document.getElementById('saveCredentialsBtn');
+
+  function getPassword(){
+    return passwordInput.value ;
+  }
+
+  function getUsername(){
+    return usernameInput.value;
+  }
+
+  function saveCredentials(){
+    alert("saved");
+    localStorage.username =  getUsername();
+    localStorage.password = getPassword()
+  }
+
+  function populateCredentials(){
+  		passwordInput.value = window.credentials.password;
+  		usernameInput.value = window.credentials.username;
+  }
+
+  function loadCredentials(){
+    if(localStorage.username && localStorage.password){
+       window.credentials = {username: localStorage.username, password: localStorage.password};
+    }else{
+      // alert("add credentials for ");
+      document.getElementById('settingsModalBtnTrigger').click()
+    }
+
+  }
+
+  loadCredentials();
+  populateCredentials();
+
+  saveCredentialsBtnEl.onclick = function(e){
+	e.preventDefault();
+	saveCredentials();
+};
+  // addEventListener("click", saveCredentials);
+  // 
+
+
+
+///progress line
+///
+var sideLine = document.getElementById('progressLineEditor');
+
+sideLine.onclick = function(e){
+	var sideLinePosition = sideLine.getBoundingClientRect()
+	console.log("sideLinePosition",sideLinePosition)
+	console.log( "sideLinePosition.bottom", sideLinePosition.bottom ," sideLinePosition.top", sideLinePosition.top)
+	var sideLineLength = sideLinePosition.bottom - sideLinePosition.top;
+	var mousePositionOnLine = e.clientY - sideLinePosition.top;
+
+	console.log("e.clientY",e.clientY);
+	console.log("sideLineLength",sideLineLength,"mousePositionOnLine",mousePositionOnLine)
+
+}
 
 //TODO: disable while speech to text 
 //textBoxEl.innerHTML = "<i>Transcription in progress...</i>"

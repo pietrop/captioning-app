@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/paper/bootstrap.min.css" >
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://www.youtube.com/iframe_api"></script>
- 
+
+
   </head>
   <body>
 
@@ -32,7 +33,7 @@
     
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
-          <input type="text" id="videoYoutubeUrlInput" class="form-control" placeholder="Add Youtube URL" value="https://youtu.be/Cd56vF3lZ_Q" >
+          <input type="text" id="videoYoutubeUrlInput" class="form-control" placeholder="Add a Youtube URL" value="https://youtu.be/Cd56vF3lZ_Q" >
           <!--  https://youtu.be/pWZAF3j_jA4  https://youtu.be/CrpkZkwTvu0 -->
         </div>
         <button type="submit" id="loadYoutubeUrlBtn" class="btn btn-primary">Load</button>
@@ -46,6 +47,17 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
        <!-- li -->
+
+       
+
+   <li>
+    <!-- <a href="#">Link</a> -->
+<!-- Button trigger modal -->
+<a class="btn-lg" data-toggle="modal" id="settingsModalBtnTrigger" data-target="#settingsModel">
+<!-- <span class="glyphicon glyphicon-cog" aria-hidden="true"> </span> Settings -->
+</a>
+</li>
+
       </ul>
     </div>
   </div>
@@ -63,13 +75,69 @@
 <br><br>
       <div id="demoNoticeDiv"></div>
 
+<!--  -->
 
-    <!--   <div id="player"></div> -->
+<!-- Credentials  -->
+<!-- Modal -->
+<div class="modal fade" id="settingsModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Speech To Text Settings</h4>
+      </div>
+      <div class="modal-body">
+      <!--  -->
+      <!-- IBM credentials form -->
+        <form id="form">
+          <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <h5>IBM Watson Speech to text Service credentials</h5>
+              <div class="form-group">
+                <label for="username">IBM STT Username</label>
+                <input type="title" name="username" value="" class="form-control" id="username" placeholder="e.g. PMYs8ZexZ7qKGkFgFJhGMYhqzEC4aNzRAv9H">
+              </div>
+              <div class="form-group">
+                <label for="password">IBM STT Password</label>
+                <input type="title" name="password" value="" class="form-control" id="password" placeholder="e.g. 2QKJ79uRsD2a">
+              </div>
+              <a id="saveCredentialsBtn"class="btn btn-primary">Save Credentials</a>
+            </div><!-- ./col -->
+          </div><!-- ./row -->
+        </form><!-- IBM tab -->
+      <!--  -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+     <!--    <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
     </div>
-    <div class="col-xs-12 col-sm-7  col-md-7  col-lg-7">
+  </div>
+</div>
+<!--  -->
+
+
+
+
+
+<!--  -->
+    </div>
+    <!--  -->
+  <!--    <div class="col-xs-12 col-sm-1  col-md-1  col-lg-1">
+      <label for="select" class="control-label">Text</label>
+      <div id="progressLineEditor"  ></div>
+    </div> -->
+    <!--  -->
+    <div class="col-xs-12 col-sm-6  col-md-6  col-lg-6">
       <!-- <label for="select" class="control-label">Text</label> -->
-      <div id="textBox"  class="form-control"  contenteditable="true"></div>
+      <div id="textBox"  class="form-control"  contenteditable="true">
+
+      </div>
     </div>
+
+     
+
+
     <div class="col-xs-12 col-sm-2  col-md-2  col-lg-2">
       <!-- Info -->
 
@@ -128,6 +196,7 @@
     </div>
 
 
+<hr>
 
 
 
@@ -147,10 +216,61 @@
 body{
       background: #f1f1f1;
 }
+
+ #videoYoutubeUrlInput {width:250px !important;}
+
+ #progressLineEditor {
+    background: grey;
+    height: 85vh;
+    width: 10px;
+}
+
 </style>
 
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.js');</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
+
+<script >
+//credentials
+// document.addEventListener("DOMContentLoaded", function() {
+  // var passwordInput = document.getElementById('password');
+  // var usernameInput = document.getElementById('username');
+  // var saveCredentialsBtnEl = document.getElementById('saveCredentialsBtn');
+
+  // function getPassword(){
+  //   return passwordInput.value ;
+  // }
+
+  // function getUsername(){
+  //   return usernameInput.value;
+  // }
+
+  // function saveCredentials(){
+  //   alert("saved");
+  //   localStorage.username =  getUsername();
+  //   localStorage.password = getPassword()
+  // }
+
+  // function loadCredentials(){
+  //   if(localStorage.username && localStorage.password){
+  //      window.credentials = {username: localStorage.username, password: localStorage.password};
+  //   }else{
+  //     // alert("add credentials for ");
+  //     document.getElementById('settingsModalBtnTrigger').click()
+  //   }
+
+  // }
+
+  // loadCredentials();
+
+  // saveCredentialsBtnEl.addEventListener("click", saveCredentials);
+// });
+</script>
+
+
+
+
 <!-- ./node_modules/bootstrap/dist/js/bootstrap.min.js -->
 </body>
     <!-- All of the Node.js APIs are available in this renderer process. -->

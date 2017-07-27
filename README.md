@@ -45,7 +45,23 @@ Review if anychanges to time and text are needed, and click `export` to save the
 
 - [using spawn function with NODE_ENV=production](https://stackoverflow.com/questions/20825157/using-spawn-function-with-node-env-production)
 
-## TODO
+- [coordinates](https://javascript.info/coordinates)
+
+## Todo 1
+
+- [x] move Load button farther to the right so that YouTube URL is more clearly visible
+
+-[ ] enhance focus indicators (white border when item has focus)
+
+
+-[ ] add enhance text-size functionality (only enlarge the text)
+
+-[ ] add keyboard shortcuts for audio playback
+
+-[ ] spelling “Aeneas” ~Aneneas~
+
+## other todos 
+
 - [x] aenes installation script to run on startup //using external dmg project
 	Eg save status in app data folder, eg boolean setupCompleted = true/false
 - [ ] Youtubedl import srt

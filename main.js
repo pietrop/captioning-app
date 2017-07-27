@@ -25,6 +25,7 @@ function createWindow () {
   }))
 
    mainWindow.dataPath = app.getPath("desktop");
+   console.log("app.getPath(appData)",app.getPath("appData"));
    mainWindow.app = app;
 
     mainWindow.desktopPath = app.getPath("desktop");

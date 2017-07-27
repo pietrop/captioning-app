@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "electron-in-page-search": "^1.2.3",
+    "jquery": "^3.2.1",
     "node-webvtt-youtube": "^1.0.0",
     "sbd": "^1.0.12",
     "shell-escape": "^0.2.0",
