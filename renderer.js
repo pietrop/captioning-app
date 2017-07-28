@@ -32,7 +32,9 @@ var textBoxEl = document.getElementById('textBox');
 var checkboxInputEl = document.getElementById('checkboxInput');
 var saveBtnEl = document.getElementById('saveBtn');
 var restoreLastSavedVersionBtnEl = document.getElementById('restoreLastSavedVersionBtn');
- 
+var selectCaptionFormatEl = document.getElementById('selectCaptionFormat');
+var selectLanguageForAlignementEl = document.getElementById('selectLanguageForAlignement');
+
 var timeout = null;
 var resumeTiypingTimeInterval = 600;
 var startStopPlayingVideoOntyping = false;
@@ -141,11 +143,20 @@ exportSrtBtnEl.onclick = function(){
 
 	var fileName = path.basename(sourceVideoPath);
 	//prompt user on where to save. add srt extension if possible. 
-	var newFilePath = desktopPath +"/"+ fileName+".srt";
+	var newFilePath = desktopPath +"/"+ fileName+"."+getCaptionsFileFormat();
 	fs.writeFileSync(newFilePath, getContentFromTextEditor(), 'utf8');
 	// or just save to desktop. 
 	alert("your file has been saved on the desktop "+newFilePath);
 
+}
+
+
+function getCaptionsFileFormat(){
+	return selectCaptionFormatEl.value ;
+}
+
+function getLanguageForAlignement(){
+	return selectLanguageForAlignementEl.value;
 }
 
 alignBtnEl.onclick = function(){
@@ -159,8 +170,8 @@ alignBtnEl.onclick = function(){
 	
 	//TODO add:  if(sourceVideoPath !="")
 	var config={
-		language: "eng", 
-		captionFileFormat : "srt",
+		language: getLanguageForAlignement(), 
+		captionFileFormat : getCaptionsFileFormat(),
 		audio_file_head_length : 0,//eg 12.000
 		audio_file_tail_length : 0, //16.000
 	 	mediaFile : sourceVideoPath,
@@ -739,19 +750,21 @@ function resetPunctuation(){
 
 ///progress line
 ///
-var sideLine = document.getElementById('progressLineEditor');
+// var sideLine = document.getElementById('progressLineEditor');
 
-sideLine.onclick = function(e){
-	var sideLinePosition = sideLine.getBoundingClientRect()
-	console.log("sideLinePosition",sideLinePosition)
-	console.log( "sideLinePosition.bottom", sideLinePosition.bottom ," sideLinePosition.top", sideLinePosition.top)
-	var sideLineLength = sideLinePosition.bottom - sideLinePosition.top;
-	var mousePositionOnLine = e.clientY - sideLinePosition.top;
+// sideLine.onclick = function(e){
+// 	var sideLinePosition = sideLine.getBoundingClientRect()
+// 	console.log("sideLinePosition",sideLinePosition)
+// 	console.log( "sideLinePosition.bottom", sideLinePosition.bottom ," sideLinePosition.top", sideLinePosition.top)
+// 	var sideLineLength = sideLinePosition.bottom - sideLinePosition.top;
+// 	var mousePositionOnLine = e.clientY - sideLinePosition.top;
 
-	console.log("e.clientY",e.clientY);
-	console.log("sideLineLength",sideLineLength,"mousePositionOnLine",mousePositionOnLine)
+// 	console.log("e.clientY",e.clientY);
+// 	console.log("sideLineLength",sideLineLength,"mousePositionOnLine",mousePositionOnLine)
 
-}
+
+
+// }
 
 //TODO: disable while speech to text 
 //textBoxEl.innerHTML = "<i>Transcription in progress...</i>"
