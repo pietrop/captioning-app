@@ -3,13 +3,19 @@
 // All of the Node.js APIs are available in this process.
 "use strict";
 
+//TODO: see if can move this code in main.js and if it still works when packaged.
+const fixPath = require('fix-path');
+console.log(process.env.PATH);
+//=> '/usr/bin'
+fixPath();
+
 const youtubedl = require('youtube-dl');
 const fs = require('fs');
 const path = require('path');
 const electron = require('electron');
 const exec = require('child_process').exec;
 const child = require('child_process').execFile;
-const { spawn } = require('child_process');
+const spawn  = require('child_process').spawn;
 const webvtt = require('node-webvtt-youtube');
 const {dialog} = require('electron').remote;
 const tokenizer = require('sbd');
@@ -35,6 +41,8 @@ var restoreLastSavedVersionBtnEl = document.getElementById('restoreLastSavedVers
 var selectCaptionFormatEl = document.getElementById('selectCaptionFormat');
 var selectLanguageForAlignementEl = document.getElementById('selectLanguageForAlignement');
 
+// var navigateBtnEl = document.getElementById('navigateBtn');
+
 var timeout = null;
 var resumeTiypingTimeInterval = 600;
 var startStopPlayingVideoOntyping = false;
@@ -47,6 +55,34 @@ restoreLastSavedVersionBtnEl.onclick = function(e){
 	e.preventDefault();
 	restoreStateFromLocalStorage();
 };
+
+
+// navigateBtnEl.onclick = function(e){
+// 	e.preventDefault();
+// 	var fileName = "tmpForJsonAlignment";
+// 	var outPutSegmentedFile =  dataPath+"/"+fileName+"._segmented"+".txt";
+// 	var textFile = dataPath+"/"+fileName+"."+"json";
+
+// 	var config={
+// 		language: getLanguageForAlignement(), 
+// 		captionFileFormat : "json",
+// 		audio_file_head_length : 0,//eg 12.000
+// 		audio_file_tail_length : 0, //16.000
+// 	 	mediaFile : sourceVideoPath,
+// 	 	outPutSegmentedFile : outPutSegmentedFile,
+// 		textFile : textFile
+// 	};
+
+// 	runAeneasComand(config, function(jsonFile){
+// 		// console.log("srtFilePath",srtFilePath);
+// 		var aeneasJson = JSON.parse(fs.readFileSync(jsonFile,'utf8'));
+// 		textBoxEl.innerHTML =parseAeneasJson(aeneasJson) 
+		
+// 		textEditorContentEditable(false);
+// 		makeLinesInteractive();
+// 	});
+
+// }
 
 saveBtnEl.onclick = function(e){
 		e.preventDefault();
@@ -279,29 +315,34 @@ function addLinksToSrtTimecodes(){
 
 	timecodesEl.forEach(function(element, index){
 		element.onclick = function(){
-			setVideoCurrentTime(element.innerText)
+			setVideoCurrentTime(element.innerText);
 		}
 	})
 }
 
 
 function setVideoCurrentTime(timecode){
-
+	var time;
+	if(typeof timecode != "number"){
 	//convert timecode
-	var time = convertTimeCodeToSeconds(timecode);
-	
-	if(isYoutubeVideo){
-		var iframe = document.querySelector('iframe');
-		var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-		// innerDoc.querySelectorAll('video')[0].click();
-		innerDoc.querySelectorAll('video')[0].currentTime = time;
-		playVideo();
-
+	 time = convertTimeCodeToSeconds(timecode);
 	}else{
-		var video = document.querySelector('video');
-		video.currentTime = time ;
-		playVideo();
+		time = timecode;
 	}
+
+		if(isYoutubeVideo){
+			var iframe = document.querySelector('iframe');
+			var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+			// innerDoc.querySelectorAll('video')[0].click();
+			innerDoc.querySelectorAll('video')[0].currentTime = time;
+			playVideo();
+
+		}else{
+			var video = document.querySelector('video');
+			video.currentTime = time ;
+			playVideo();
+		}
+	
 }
 
 
@@ -515,9 +556,10 @@ function runAeneasComand(config,cb){
 	// console.log(JSON.stringify(config,null,2));
 	var outPutSegmentedFile = config.outPutSegmentedFile;
 	console.log("Aeneas outPutSegmentedFile",outPutSegmentedFile);
-	///usr/local/bin/aeneas_execute_task
+	///usr/local/bin/aeneas_execute_task///usr/local/bin/aeneas_execute_task  //python -m aeneas.tools.execute_task 
 	var aeneasComandString = `/usr/local/bin/aeneas_execute_task "${mediaFile}" "${outPutSegmentedFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`;
 	// var productionEnv = Object.create(process.env);
+	console.log(aeneasComandString)
 	var aeneasPath = "/usr/local/bin/aeneas_execute_task";
 	var ffmpegPath = "/usr/local/bin/ffmpeg";
 	var ffprobePath = "/usr/local/bin/ffprobe";
@@ -532,29 +574,10 @@ function runAeneasComand(config,cb){
 	        console.log('exec error: ' + error);
 	    }
 	});
-
-	//
-	// var executablePath = "/usr/local/bin/aeneas_execute_task";
-	// var parameters = [mediaFile,outPutSegmentedFile,"task_language",language,"--skip-validator", "os_task_file_format",captionFileFormat,"is_text_type","subtitles", "is_audio_file_head_length",audio_file_head_length,"is_audio_file_tail_length",audio_file_tail_length,"task_adjust_boundary_nonspeech_min",1.000,"task_adjust_boundary_nonspeech_string","REMOVE","task_adjust_boundary_algorithm","percent","task_adjust_boundary_percent_value",75,"is_text_file_ignore_regex","[*]",outputCaptionFile ];
-	// const aeneasProcess = spawn(executablePath, parameters);
-
-	// aeneasProcess.stdout.on('data', (data) => {
-	//   console.log(`Result from aeneasProcess:  ${data}`);
-	// });
-	
-	// var executablePath = "/usr/local/bin/aeneas_execute_task";
-	// var aneneasComand = `${mediaFile} ${outPutSegmentedFile} "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`
-	// // var parameters = [mediaFile,outPutSegmentedFile,"task_language",language,"--skip-validator", "os_task_file_format",captionFileFormat,"is_text_type","subtitles", "is_audio_file_head_length",audio_file_head_length,"is_audio_file_tail_length",audio_file_tail_length,"task_adjust_boundary_nonspeech_min",1.000,"task_adjust_boundary_nonspeech_string","REMOVE","task_adjust_boundary_algorithm","percent","task_adjust_boundary_percent_value",75,"is_text_file_ignore_regex","[*]",outputCaptionFile ];
-	// var parameters = []
-	// parameters.push(aneneasComand);
-	// child(executablePath, parameters, function(err, data) {
-	//      console.log(err)
-	//      console.log("data.toString()",data.toString());
-	//      // fs.writeFileSync(outputCaptionFile,data.toString() ,"utf8");
-	//      if(cb){cb(outputCaptionFile)};
-	// });
-
 }
+
+
+
 
 
 window.segmentTranscript = segmentTranscript;
@@ -627,16 +650,7 @@ function sentenceBoundariesDetection(textFile,outPutSegmentedFile,cb){
 			if(cb){cb(outPutSegmentedFile3)};
 
 		});
-
 	});
-
-
-
-
-
-
-
-	
 }
 
 
@@ -703,50 +717,71 @@ function resetPunctuation(){
 
 ///Credentials 
 
- var passwordInput = document.getElementById('password');
-  var usernameInput = document.getElementById('username');
-  var saveCredentialsBtnEl = document.getElementById('saveCredentialsBtn');
+//  var passwordInput = document.getElementById('password');
+//   var usernameInput = document.getElementById('username');
+//   var saveCredentialsBtnEl = document.getElementById('saveCredentialsBtn');
 
-  function getPassword(){
-    return passwordInput.value ;
-  }
+//   function getPassword(){
+//     return passwordInput.value ;
+//   }
 
-  function getUsername(){
-    return usernameInput.value;
-  }
+//   function getUsername(){
+//     return usernameInput.value;
+//   }
 
-  function saveCredentials(){
-    alert("saved");
-    localStorage.username =  getUsername();
-    localStorage.password = getPassword()
-  }
+//   function saveCredentials(){
+//     alert("saved");
+//     localStorage.username =  getUsername();
+//     localStorage.password = getPassword()
+//   }
 
-  function populateCredentials(){
-  		passwordInput.value = window.credentials.password;
-  		usernameInput.value = window.credentials.username;
-  }
+//   function populateCredentials(){
+//   		passwordInput.value = window.credentials.password;
+//   		usernameInput.value = window.credentials.username;
+//   }
 
-  function loadCredentials(){
-    if(localStorage.username && localStorage.password){
-       window.credentials = {username: localStorage.username, password: localStorage.password};
-    }else{
-      // alert("add credentials for ");
-      document.getElementById('settingsModalBtnTrigger').click()
-    }
+//   function loadCredentials(){
+//     if(localStorage.username && localStorage.password){
+//        window.credentials = {username: localStorage.username, password: localStorage.password};
+//     }else{
+//       // alert("add credentials for ");
+//       document.getElementById('settingsModalBtnTrigger').click()
+//     }
 
-  }
+//   }
 
-  loadCredentials();
-  populateCredentials();
+//   loadCredentials();
+//   populateCredentials();
 
-  saveCredentialsBtnEl.onclick = function(e){
-	e.preventDefault();
-	saveCredentials();
-};
+//   saveCredentialsBtnEl.onclick = function(e){
+// 	e.preventDefault();
+// 	saveCredentials();
+// };
   // addEventListener("click", saveCredentials);
   // 
 
 
+
+function parseAeneasJson(aeneasJson){
+	var result = "";
+	var fragments = aeneasJson.fragments;
+	fragments.forEach(function(frag){
+		result += `<span class="alignedline" data-start=${frag.begin} data-end=${frag.end}>${frag.lines} </span>`
+		
+		
+	})
+	return result;
+}
+
+
+function makeLinesInteractive(){
+	var lines = document.getElementsByClassName('alignedline');
+	for(var i=0; i<lines.length; i++){
+		lines[i].onclick = function(){
+			setVideoCurrentTime(parseInt(lines[i].dataset.start))
+		}
+	}
+}
 
 ///progress line
 ///

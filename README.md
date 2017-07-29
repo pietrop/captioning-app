@@ -23,6 +23,9 @@ click `align` to get a preview of an srt file, with clicable timecodes.
 
 Review if anychanges to time and text are needed, and click `export` to save the srt file on the desktop.
 
+Extra feature, you can also use your mac speech text from within the app, if you want to listen to the trascription. 
+
+![Captions Maker STT](/docs/img/captions-maker-stt.png)
 
 ###  R&D Resources
 
@@ -47,6 +50,10 @@ Review if anychanges to time and text are needed, and click `export` to save the
 
 - [coordinates](https://javascript.info/coordinates)
 
+-[electron-run-shell-example](https://github.com/martinjackson/electron-run-shell-example)
+
+- [Can't run command line tool using child_process after packaged](https://github.com/electron/electron/issues/7688) need to add [fix-path](https://github.com/sindresorhus/fix-path) to render process(?)
+
 ## Todo 1
 
 - [x] move Load button farther to the right so that YouTube URL is more clearly visible
@@ -59,6 +66,9 @@ Review if anychanges to time and text are needed, and click `export` to save the
 -[ ] add keyboard shortcuts for audio playback
 
 -[ ] spelling “Aeneas” ~Aneneas~
+
+
+-[ ] button progress, when click align and processing.[bootstrap button loading state](https://getbootstrap.com/javascript/#buttons) 
 
 ## other todos 
 

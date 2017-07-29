@@ -135,3 +135,58 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+// 
+// 
+function runAeneasComand(config,cb){
+  var mediaFile = config.mediaFile;
+  var textFile = config.textFile;
+  var language = config.language;
+  var captionFileFormat = config.captionFileFormat;
+  var audio_file_head_length = config.audio_file_head_length;//eg 12.000
+  var audio_file_tail_length = config.audio_file_tail_length; //16.000
+  // var tmpTextFileName = dataPath +"/"+ fileName;
+  var fileName = path.basename(mediaFile);
+  var outputCaptionFile = dataPath+"/"+fileName+"."+captionFileFormat;
+  // console.log(JSON.stringify(config,null,2));
+  var outPutSegmentedFile = config.outPutSegmentedFile;
+  console.log("Aeneas outPutSegmentedFile",outPutSegmentedFile);
+  ///usr/local/bin/aeneas_execute_task
+  var aeneasComandString = `/usr/local/bin/aeneas_execute_task "${mediaFile}" "${outPutSegmentedFile}" "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`;
+  // var productionEnv = Object.create(process.env);
+  var aeneasPath = "/usr/local/bin/aeneas_execute_task";
+  var ffmpegPath = "/usr/local/bin/ffmpeg";
+  var ffprobePath = "/usr/local/bin/ffprobe";
+  var espeakPath = "/usr/local/bin/espeak";
+  var envVar =   {'ffmpeg': ffmpegPath , 'ffprobe': ffprobePath, 'espeak':espeakPath, 'aeneas_execute_task': aeneasPath};
+  var options ={env: envVar, cwd: appPath}
+  exec(aeneasComandString, function(error, stdout, stderr) {
+      console.log('stdout runAeneasComand: ' + stdout);
+      console.log('stderr runAeneasComand: ' + stderr);
+      if(cb){cb(outputCaptionFile)};
+      if (error !== null) {
+          console.log('exec error: ' + error);
+      }
+  });
+
+  //
+  // var executablePath = "/usr/local/bin/aeneas_execute_task";
+  // var parameters = [mediaFile,outPutSegmentedFile,"task_language",language,"--skip-validator", "os_task_file_format",captionFileFormat,"is_text_type","subtitles", "is_audio_file_head_length",audio_file_head_length,"is_audio_file_tail_length",audio_file_tail_length,"task_adjust_boundary_nonspeech_min",1.000,"task_adjust_boundary_nonspeech_string","REMOVE","task_adjust_boundary_algorithm","percent","task_adjust_boundary_percent_value",75,"is_text_file_ignore_regex","[*]",outputCaptionFile ];
+  // const aeneasProcess = spawn(executablePath, parameters);
+
+  // aeneasProcess.stdout.on('data', (data) => {
+  //   console.log(`Result from aeneasProcess:  ${data}`);
+  // });
+  
+  // var executablePath = "/usr/local/bin/aeneas_execute_task";
+  // var aneneasComand = `${mediaFile} ${outPutSegmentedFile} "task_language=${language}|os_task_file_format=${captionFileFormat}|is_text_type=subtitles|is_audio_file_head_length=${audio_file_head_length}|is_audio_file_tail_length=${audio_file_tail_length}|task_adjust_boundary_nonspeech_min=1.000|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=75|is_text_file_ignore_regex=[*]" ${outputCaptionFile}`
+  // // var parameters = [mediaFile,outPutSegmentedFile,"task_language",language,"--skip-validator", "os_task_file_format",captionFileFormat,"is_text_type","subtitles", "is_audio_file_head_length",audio_file_head_length,"is_audio_file_tail_length",audio_file_tail_length,"task_adjust_boundary_nonspeech_min",1.000,"task_adjust_boundary_nonspeech_string","REMOVE","task_adjust_boundary_algorithm","percent","task_adjust_boundary_percent_value",75,"is_text_file_ignore_regex","[*]",outputCaptionFile ];
+  // var parameters = []
+  // parameters.push(aneneasComand);
+  // child(executablePath, parameters, function(err, data) {
+  //      console.log(err)
+  //      console.log("data.toString()",data.toString());
+  //      // fs.writeFileSync(outputCaptionFile,data.toString() ,"utf8");
+  //      if(cb){cb(outputCaptionFile)};
+  // });
+
+}
