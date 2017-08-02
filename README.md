@@ -27,6 +27,14 @@ Extra feature, you can also use your mac speech text from within the app, if you
 
 ![Captions Maker STT](/docs/img/captions-maker-stt.png)
 
+
+## Todo 
+
+- [Using trello board for tracking development features and R&D](https://trello.com/b/Mb5GXSfN)
+- Github issues for bugs. 
+
+
+
 ###  R&D Resources
 
 - [YouTube Player API Reference for iframe Embeds](https://developers.google.com/youtube/iframe_api_reference)
@@ -54,135 +62,11 @@ Extra feature, you can also use your mac speech text from within the app, if you
 
 - [Can't run command line tool using child_process after packaged](https://github.com/electron/electron/issues/7688) need to add [fix-path](https://github.com/sindresorhus/fix-path) to render process(?)
 
-## Todo 1
+## Active Contributors 
 
-- [x] move Load button farther to the right so that YouTube URL is more clearly visible
-
--[ ] enhance focus indicators (white border when item has focus)
+- Pietro Passarelli
 
 
--[ ] add enhance text-size functionality (only enlarge the text)
-
--[ ] add keyboard shortcuts for audio playback
-
--[ ] spelling “Aeneas” ~Aneneas~
+<!-- Initial requirements gathering and specification while at textAV with Joseph Polizzotto, Gideo, Marshal, and Jane -->
 
 
--[ ] button progress, when click align and processing.[bootstrap button loading state](https://getbootstrap.com/javascript/#buttons) 
-
-## other todos 
-
-- [x] aenes installation script to run on startup //using external dmg project
-	Eg save status in app data folder, eg boolean setupCompleted = true/false
-- [ ] Youtubedl import srt
-- [x] align/aeneas
-	- [ ] perl script to prep alignment //integrated, but not working properly
-
-- [Add support for honorifics](https://github.com/polizoto/segment_transcript/blob/master/HONORIFICS) 
-
-
-- [ ] add head and tail parameters from input field. with some validation. 
-- [ ] add help message on what head and tails refer to (part to ignore at beginning or end, eg if there is music).
-
-- [x] Import video 
-	- [ ] move to user tmp folder?
-
-- [ ] convert to audio
-- [ ] convert to video
-- [ ] STT API (eg baidu?) or youtube scraping etc..
-
-- [ ] support for multiple captioning file formats 
-
-- [ ] add `vtt` track (see if it is possible to update) to preview captions on video element.
-
-
-- [ ] add punctuaiton button, with warning that removes existing punctuation and then adds new one (?).
-
-
-- [ ] Error handling if youtube video does not have any transcriptions. add to text editor "Seems like this video does not have any transcriptions".
-
-- [ ] If youtube captions have accurate human captions, display those instead of the automatic once. Find a way to check in results what you get. 
-
-- [ ] youtube captions, language preference.
-
-- [ ] alignement language preference (for espeek) button is there, need to be passed as param to aeneas
-
-- [ ] Need to add Error handling and checks for when async operations are happening, eg downloading the video or the captions. 
-
-
-- [ ] consider adding timecodes eg <00:00:00,120> in pre-aligned transcription, every so ofter, eg every paragraph. to make it easier to navigate.
-
-- [ ] add to side panel info about using notation `[Speaker Name]` to identify speakers in the text. 
-
-- [ ] add `landmark regions` regions for accessibility. 
-
-- [ ] add STT service. Decide which one. 
-
-- [ ] Check accuracy of working with Honorifics when segmenting lines. function `sentenceBoundariesDetection()`
-- [ ] find comprehensive list of honorifics. eg 150. add to `HONORIFICS` file by Joseph in this repo. 
-
-- [ ] Move temp files onto another data dir, eg in library. 
-
-- [ ] REFACTOR: Remove write to file as step in code in `render.js` to pass data in between things
-
-- [ ] Error handling 
-
-
-
-- [ ] Save function?
-
-- [ ] Download youtube video and use that for preview? (for offline porpusoses)
-
-- [ ] Tab key, focus indicator styling, yellow indicator around focus element.
-- [ ] Make select file button accessible with Tab key
-
-
-- [ ] Add timecode in intermediate draft. 
-	Add Timcodes as headings in this view so that it's easier to navigate. 
-	For blind people `5 Minutes` , `10 Minutes` etc.. with value of `00:05:00,000` (`hh:mm:ss,sss`).
-
-- [ ] Localhost save so that you can pick up where you left. 
-var textBoxEl = document.getElementById('textBox');
-localStorage.tmpTest =  textBoxEl.innerText
-Then to repopulate on load if that is empty. 
-textBoxEl.innerTex = localStorage.tmpTest;
-also need to load the video. save in local storage which video URL it is
-
-
-- [ ] Why bug with this video file? `https://youtu.be/L4TGZdTjPGQ`
-
-
-<!-- 
-
-https://youtu.be/L4TGZdTjPGQ
-
- -->
-
-
-
-## Before first release
-
-- [ ] Adjust the segmentation alogirth pre-alignement with last two steps
-- [x] Switch youtube to local copy of viedeo downloaded with youtube-dl
-- [ ] Save using local storage (text and video url). 
-	-[X] save button 
-	+ auto save
-	+ save interval with custom field. (optional)
-
-
-- [ ] Move videos in library path.  
-
-<!-- Some code notes
-
-
-
-
-
-
-//to add captions dynamically  - Might not be needed as a requiremen
-// maybe add button, update captions preview. or auto trigger. 
-// might need to write the `vtt` file. and then code below to update on video.
-// altho it better if video was bigger. 
-// document.querySelector("video").innerHTML = '<track label="English Captions" srclang="en" kind="captions" src="/Users/pietropassarelli/Dropbox/CODE/NODE/webVideoTextCrawler/test/results.vtt" type="text/vtt" default />'
-
- -->
