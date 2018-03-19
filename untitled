@@ -58,14 +58,11 @@ restoreLastSavedVersionBtnEl.onclick = function(e){
 
 
 navigateBtnEl.onclick = function(e){
-	console.info("NAVIGATE  BTN")
+	console.log("navigate bt")
 	e.preventDefault();
-	// var fileName = "tmpForJsonAlignment";
-	// var outPutSegmentedFile =  dataPath+"/"+fileName+"._segmented"+".txt";
-	var fileName = path.basename(sourceVideoPath);
-	var outPutSegmentedFile =   dataPath+"/"+fileName+"._segmented"+".txt";
-	// var textFile = dataPath+"/"+fileName+"."+"json";
-	var textFile = createTextFileFromTextEditor();
+	var fileName = "tmpForJsonAlignment";
+	var outPutSegmentedFile =  dataPath+"/"+fileName+"._segmented"+".txt";
+	var textFile = dataPath+"/"+fileName+"."+"json";
 
 	var config={
 		language: getLanguageForAlignement(), 
@@ -77,8 +74,8 @@ navigateBtnEl.onclick = function(e){
 		textFile : textFile
 	};
 
-	console.info("FLAG 1",outPutSegmentedFile, textFile);
-
+	console.log(outPutSegmentedFile, textFile);
+	
 	runAeneasComand(config, function(jsonFile){
 		// console.log("srtFilePath",srtFilePath);
 		var aeneasJson = JSON.parse(fs.readFileSync(jsonFile,'utf8'));
@@ -229,7 +226,7 @@ alignBtnEl.onclick = function(){
 		
 		config.outPutSegmentedFile = respSegmentedFileContent;
 
-		console.log('config.outPutSegmentedFile',config.outPutSegmentedFile);
+		console.info('config.outPutSegmentedFile',config.outPutSegmentedFile);
 		console.log("LDLDL",fs.readFileSync(respSegmentedFileContent ).toString());
 
 		runAeneasComand(config, function(srtFilePath){
@@ -327,27 +324,27 @@ function addLinksToSrtTimecodes(){
 }
 
 
-function setVideoCurrentTimeForNavigate(time){
-	// var time;
-	// if(typeof timecode != "number"){
-	// //convert timecode
-	//  time = convertTimeCodeToSeconds(timecode);
-	// }else{
-		// var time = timecode;
-	// }
+function setVideoCurrentTime(timecode){
+	var time;
+	if(typeof timecode != "number"){
+	//convert timecode
+	 time = convertTimeCodeToSeconds(timecode);
+	}else{
+		time = timecode;
+	}
 
-		// if(isYoutubeVideo){
-		// 	var iframe = document.querySelector('iframe');
-		// 	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-		// 	// innerDoc.querySelectorAll('video')[0].click();
-		// 	innerDoc.querySelectorAll('video')[0].currentTime = time;
-		// 	playVideo();
+		if(isYoutubeVideo){
+			var iframe = document.querySelector('iframe');
+			var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+			// innerDoc.querySelectorAll('video')[0].click();
+			innerDoc.querySelectorAll('video')[0].currentTime = time;
+			playVideo();
 
-		// }else{
+		}else{
 			var video = document.querySelector('video');
 			video.currentTime = time ;
 			playVideo();
-		// }
+		}
 	
 }
 
@@ -592,7 +589,7 @@ function segmentTranscript(config,cb){
 	var inputFile 				= config.textFile;
 	var outPutSegmentedFile 	= config.outPutSegmentedFile;
 	// var segmentTranscriptComand =`perl ${appPath}/sentence-boundary.pl -d ${appPath}/HONORIFICS -i ${inputFile} -o ${outPutSegmentedFile}`;
-	  sentenceBoundariesDetection(inputFile, outPutSegmentedFile, function(filePathSetencesWithLines){
+	  sentenceBoundariesDetection(inputFile,outPutSegmentedFile, function(filePathSetencesWithLines){
 
 			if(cb){cb(filePathSetencesWithLines);}
 	 });
@@ -646,13 +643,13 @@ function sentenceBoundariesDetection(textFile,outPutSegmentedFile,cb){
 		//# Insert new line for every two lines, preserving paragraphs
 		// perl -00 -ple 's/.*\n.*\n/$&\n/mg' test3.txt > "$f"
 		var outPutSegmentedFile3 = outPutSegmentedFile+"3.txt";
-		exec(`perl -00 -ple 's/.*\n.*\n/$&\n/mg' ${outPutSegmentedFile2} > ${outPutSegmentedFile3}`, function(error, stdout, stderr) {
+		exec(`'perl -00 -ple 's/.*\n.*\n/$&\n/mg ${outPutSegmentedFile2} > ${outPutSegmentedFile3}`, function(error, stdout, stderr) {
 			console.log('stdout Segmented Script: ' + stdout);
 		    console.log('stderr Segmented Script: ' + stderr);
 		    if (error !== null) {
 		        console.log('exec error Perl Script: ' + error);
 		    }
-			console.log("outPutSegmentedFile3", outPutSegmentedFile3);
+			
 			if(cb){cb(outPutSegmentedFile3)};
 
 		});
@@ -769,12 +766,10 @@ function resetPunctuation(){
 
 
 function parseAeneasJson(aeneasJson){
-
 	var result = "";
 	var fragments = aeneasJson.fragments;
-
+	console.info('frag.begin', frag.begin);
 	fragments.forEach(function(frag){
-		console.info('frag.begin', frag.begin);
 		result += `<span class="alignedline" data-start=${frag.begin} data-end=${frag.end}>${frag.lines} </span>`
 		
 		
@@ -784,55 +779,13 @@ function parseAeneasJson(aeneasJson){
 
 
 function makeLinesInteractive(){
-	//declaring counter for loop here so that it is visible in scope of on click ananonimous function;
-	// var i; 
 	var lines = document.getElementsByClassName('alignedline');
-	for(var i=0; i< (lines.length -1) ; i++){
-		console.log(i, lines.length);
-		// var line = lines[i];
-		// lines.forEach(function(line){
-			lines[i].addEventListener("click", function(ev){
-				console.log(ev, ev.target)//;
-				console.log(lines[i], lines[i].dataset.start, lines[i], ev.target.dataset.start);
-				setVideoCurrentTimeForNavigate(parseInt(ev.target.dataset.start));
-				// setVideoForClickLine(line);
-			});
-		// });
+	for(var i=0; i<lines.length; i++){
+		lines[i].onclick = function(){
+			setVideoCurrentTime(parseInt(lines[i].dataset.start))
 		}
-}
-
-
-
-
-
-function setVideoCurrentTime(timecode){
-	var time;
-	if(typeof timecode != "number"){
-	//convert timecode
-	 time = convertTimeCodeToSeconds(timecode);
-	}else{
-		time = timecode;
 	}
-
-		if(isYoutubeVideo){
-			var iframe = document.querySelector('iframe');
-			var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-			// innerDoc.querySelectorAll('video')[0].click();
-			innerDoc.querySelectorAll('video')[0].currentTime = time;
-			playVideo();
-
-		}else{
-			var video = document.querySelector('video');
-			video.currentTime = time ;
-			playVideo();
-		}
-	
 }
-
-
-// function setVideoForClickLine(line){
-// 	setVideoCurrentTime(parseInt(line.dataset.start));
-// }
 
 ///progress line
 ///

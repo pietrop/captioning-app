@@ -34,6 +34,13 @@ Extra feature, you can also use your mac speech text from within the app, if you
 - Github issues for bugs. 
 
 
+<!-- - Keep the spaces in navigate otpion  
+srt file remove line breaks and re organise
+
+alignement for hypertranscript keep line breaks. 
+-->
+
+
 
 ###  R&D Resources
 

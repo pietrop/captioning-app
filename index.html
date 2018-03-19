@@ -7,7 +7,9 @@
 
   <!-- Latest compiled and minified CSS -->
   <!-- TODO: move to local folder -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/paper/bootstrap.min.css" >
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/paper/bootstrap.min.css" > -->
+    <!-- <link rel="stylesheet" media="screen" href="node_modules/bootstrap/dist/css/bootstrap.css"> -->
+      <link rel="stylesheet" type="text/css" href="css/bootswatch.css" rel="stylesheet" media="screen">
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -63,9 +65,9 @@
   </div>
 </nav>
 
-<div class="container" >
+<div class="container-fluid" >
   <div class="row">
-    <div class="col-xs-12 col-sm-3  col-md-3  col-lg-3">
+    <div class="col-xs-12 col-sm-5  col-md-5  col-lg-5">
       <!-- <label for="select" class="control-label">Video preview</label> -->
       <!-- <a  id="selectFileBtn" class="btn btn-primary btn-xs ">Select file</a> -->
          <!-- <br><br> -->
@@ -128,14 +130,14 @@
       <div id="progressLineEditor"  ></div>
     </div> -->
     <!--  -->
-    <div class="col-xs-12 col-sm-6  col-md-6  col-lg-6">
+    <div class="col-xs-12 col-sm-5  col-md-5  col-lg-5">
       <!-- <label for="select" class="control-label">Text</label> -->
       <div id="textBox"  class="form-control"  contenteditable="true">
 
       </div>
     </div>
 
-     
+
 
 
     <div class="col-xs-12 col-sm-2  col-md-2  col-lg-2">
@@ -144,7 +146,9 @@
  <div class="form-group">
        <a id="installAeneas" class="btn btn-default btn-xs" href="https://github.com/sillsdev/aeneas-installer/releases" target="_blank">Install Aneneas aligner</a>
         <a id="alignBtn" class="btn btn-primary btn-xs" href="#">Align</a>
-        <!-- <a id="navigateBtn" class="btn btn-primary btn-xs" href="#">Navigate</a> -->
+        <a id="navigateBtn" class="btn btn-primary btn-xs" href="#">Navigate</a>
+         <a id="editBtn" class="btn btn-primary btn-xs" href="#">Edit</a>
+         
         <a id="exportSrtBtn" class="btn btn-primary btn-xs" href="#">Export</a>
         <a id="saveBtn" class="btn btn-primary btn-xs" href="#">Save</a>
         <a id="restoreLastSavedVersionBtn" class="btn btn-primary btn-xs" href="#">Restore last saved</a>
@@ -322,6 +326,20 @@ var videoYoutubeUrlInputEl = document.getElementById('videoYoutubeUrlInput');
 var videoPreviewEl = document.getElementById('videoPreview');
 var textBoxEl = document.getElementById('textBox');
 var checkboxInputEl = document.getElementById('checkboxInput');
+
+
+var editBtnEl = document.getElementById('editBtn');  
+
+editBtnEl.onclick = function(e){
+
+  //as a way to strip out html tags from content editable 
+  var tmptextBoxElInnerText = textBoxEl.innerText;
+//remove any HTML         
+ textBoxEl.innerText  = tmptextBoxElInnerText
+//make editabled again 
+  textBoxEl.contentEditable = true;
+
+}
 
 var isYoutubeVideo = true;
 var timeout = null;
