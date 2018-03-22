@@ -1,6 +1,6 @@
 # Captioning App 
 
-Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](http://textAV.tech) event unconference group.
+Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](http://textAV.tech) event unconference group. Electron, osx desktop app, see [release section](https://github.com/pietrop/captioning-app/releases/tag/1.0.0) for os x `dmg` packaged version.
 
 ## Dummy demo 
 
@@ -30,7 +30,7 @@ Extra feature, you can also use your mac speech text from within the app, if you
 
 ## Todo 
 
-- [Using trello board for tracking development features and R&D](https://trello.com/b/Mb5GXSfN)
+- [Using trello board for tracking development features and R&D](https://trello.com/b/Mb5GXSfN/captioning-app)
 - Github issues for bugs. 
 
 

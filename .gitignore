@@ -1,5 +1,7 @@
 # .gitignore, files to ignore when pushing to github 
 
+dist/
+
 tmp/*.txt
 tmp/*.srt
 
