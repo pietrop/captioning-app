@@ -1,4 +1,4 @@
-# Captions Maker 
+# Captioning App 
 
 Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](http://textAV.tech) event unconference group.
 
