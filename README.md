@@ -4,7 +4,7 @@ Inspired by [oTranscribe](http://otranscribe.com) and on the back of [textAV](ht
 
 ## Dummy demo 
 
---->[DEMO](http://pietropassarelli.com/captions-maker/) <----
+--->[DEMO](http://pietropassarelli.com/captioning-app/) <----
 
 
 ##  Screenshots and usage
